@@ -19,8 +19,17 @@ class SudoCommand(models.Model):
 
 
 class SudoRule(models.Model):
+    name = models.CharField(max_length=50)
     sudo_user = models.ForeignKey(SudoUser, on_delete=models.CASCADE)
     sudo_host = models.ForeignKey(SudoHost, on_delete=models.CASCADE)
     sudo_command = models.ManyToManyField(SudoCommand)
-    run_as_user = models.ForeignKey(SudoUser, on_delete=models.CASCADE)
-    run_as_group = models.ForeignKey(SudoUser, on_delete=models.CASCADE)
+    run_as_user = models.ForeignKey(
+        SudoUser,
+        related_name='sudorule_runasuser_set',
+        on_delete=models.CASCADE
+    )
+    run_as_group = models.ForeignKey(
+        SudoUser,
+        related_name='sudorule_runasgroup_set',
+        on_delete=models.CASCADE
+    )
