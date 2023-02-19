@@ -11,19 +11,19 @@ from .models import (
 class SudoUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoUser
-        fields = ['username']
+        fields = ['pk', 'username']
 
 
 class SudoHostSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoHost
-        fields = ['hostname']
+        fields = ['pk', 'hostname']
 
 
 class SudoCommandSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoCommand
-        fields = ['command', 'diggest']
+        fields = ['pk', 'command', 'diggest']
 
 
 class SudoRuleSerializer(serializers.ModelSerializer):
@@ -35,7 +35,7 @@ class SudoRuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoRule
-        fields = ['name', 'sudo_user', 'sudo_host',
+        fields = ['pk', 'name', 'sudo_user', 'sudo_host',
             'sudo_command', 'run_as_user', 'run_as_group']
 
     def create(self, validated_data): # POST

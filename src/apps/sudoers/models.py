@@ -1,5 +1,7 @@
 from django.db import models
 
+from helpers.validators.model_validators import validate_hostname
+
 
 class SudoUser(models.Model):
     ''' https://www.sudo.ws/docs/man/1.8.17/sudoers.ldap.man/#sudoUser
@@ -12,7 +14,8 @@ class SudoUser(models.Model):
 
 class SudoHost(models.Model):
 
-    hostname = models.CharField(max_length=253) # maximum of 253 ASCII characters
+    hostname = models.CharField(max_length=253, unique=True,
+        validators=[validate_hostname]) # maximum of 253 ASCII characters
 
     def __str__(self):
         return self.hostname
