@@ -4,6 +4,7 @@ from .models import (
     SudoRule,
     SudoUser,
     SudoHost,
+    SudoCommand,
 )
 
 
@@ -21,17 +22,21 @@ class SudoHostSerializer(serializers.ModelSerializer):
 
 class SudoCommandSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SudoUser
-        fields = ['username']
+        model = SudoCommand
+        fields = ['command', 'diggest']
 
 
 class SudoRuleSerializer(serializers.ModelSerializer):
     sudo_user = SudoUserSerializer(many=True)
     sudo_host = SudoHostSerializer(many=True)
+    sudo_command = SudoCommandSerializer(many=True)
+    run_as_user = SudoUserSerializer()
+    run_as_group = SudoUserSerializer()
 
     class Meta:
         model = SudoRule
-        fields = ['name', 'sudo_user', 'sudo_host']
+        fields = ['name', 'sudo_user', 'sudo_host',
+            'sudo_command', 'run_as_user', 'run_as_group']
 
     def create(self, validated_data): # POST
         sudo_users = validated_data.pop('sudo_user')
