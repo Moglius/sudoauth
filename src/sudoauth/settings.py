@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'apps.sudoers'
+    'apps.sudoers',
+    'apps.lnxusers'
 ]
 
 MIDDLEWARE = [
