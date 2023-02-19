@@ -1,10 +1,6 @@
 from rest_framework import serializers
 
-from .models import (
-    LnxGroup,
-    LnxShell,
-    LnxUser
-)
+from .models import LnxGroup, LnxShell, LnxUser
 
 
 class LnxShellSerializer(serializers.ModelSerializer):

@@ -1,11 +1,7 @@
 from rest_framework import serializers
 
-from .models import (
-    SudoRule,
-    SudoUser,
-    SudoHost,
-    SudoCommand,
-)
+from .models import (SudoRule, SudoUser,
+    SudoHost, SudoCommand)
 
 
 class SudoUserSerializer(serializers.ModelSerializer):
