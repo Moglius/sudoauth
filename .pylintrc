@@ -419,7 +419,10 @@ disable=raw-checker-failed,
         invalid-str-returned,
         missing-class-docstring,
         too-few-public-methods,
-        missing-module-docstring
+        missing-module-docstring,
+        too-many-ancestors,
+        no-member,
+        import-outside-toplevel
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
