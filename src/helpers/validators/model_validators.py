@@ -3,9 +3,18 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
+def _is_valid_username(value):
+    # the TLD must be not all-numeric
+    if not re.match(r"[\w]+$", value[-1]):
+        return False
+    if not re.match(r"[\w]+$", value[0]):
+        return False
+    regex = re.compile(r"^[\w\s._-]+\Z")
+    return re.fullmatch(regex, value)
+
 def _is_valid_path(value):
-    pattern = re.compile(r"^/|(/[\w-]+)+$")
-    return re.fullmatch(pattern, value)
+    regex = re.compile(r"^/|(/[\w-]+)+$")
+    return re.fullmatch(regex, value)
 
 def _is_valid_hostname(value):
     if len(value) > 253 or len(value) < 4:
@@ -33,5 +42,12 @@ def validate_hostname(value):
     if not _is_valid_hostname(value):
         raise ValidationError(
             _('%(value)s is not a valid hostname'),
+            params={'value': value},
+        )
+
+def validate_username(value):
+    if not _is_valid_username(value):
+        raise ValidationError(
+            _('%(value)s is not a valid username'),
             params={'value': value},
         )

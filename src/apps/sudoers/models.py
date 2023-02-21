@@ -1,6 +1,7 @@
 from django.db import models
 
-from helpers.validators.model_validators import validate_hostname
+from helpers.validators.model_validators import (validate_hostname,
+    validate_path)
 
 
 class SudoUser(models.Model):
@@ -23,7 +24,9 @@ class SudoHost(models.Model):
 
 class SudoCommand(models.Model):
 
-    command = models.CharField(max_length=255)
+    command = models.CharField(max_length=255,
+        validators=[validate_path])
+    args = models.CharField(max_length=255)
     diggest = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):

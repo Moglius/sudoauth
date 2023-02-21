@@ -2,7 +2,8 @@ from os import path
 from django.db import models
 
 from apps.sudoers.models import SudoUser
-from helpers.validators.model_validators import validate_path
+from helpers.validators.model_validators import (validate_path,
+    validate_username)
 
 
 class LnxShell(models.Model):
@@ -18,7 +19,8 @@ class LnxShell(models.Model):
 
 
 class LnxGroup(models.Model):
-    groupname = models.CharField(max_length=65)
+    groupname = models.CharField(max_length=65,
+        validators=[validate_username])
     gid_number = models.BigIntegerField(unique=True)
 
     related_group = models.ForeignKey(
@@ -36,7 +38,8 @@ class LnxGroup(models.Model):
 
 
 class LnxUser(models.Model):
-    username = models.CharField(max_length=50) # uid
+    username = models.CharField(max_length=50,
+        validators=[validate_username]) # uid
     uid_number = models.BigIntegerField(unique=True)
     primary_group = models.ForeignKey(
         LnxGroup,
