@@ -7,7 +7,7 @@ from helpers.validators.model_validators import (validate_hostname,
 class SudoUser(models.Model):
     ''' https://www.sudo.ws/docs/man/1.8.17/sudoers.ldap.man/#sudoUser
     '''
-    username = models.CharField(max_length=65)
+    username = models.CharField(max_length=65, unique=True)
 
     def __str__(self):
         return self.username

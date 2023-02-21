@@ -1,6 +1,5 @@
 from os import path
 from django.db import models
-
 from apps.sudoers.models import SudoUser
 from helpers.validators.model_validators import (validate_path,
     validate_username)
@@ -31,14 +30,20 @@ class LnxGroup(models.Model):
     def __str__(self):
         return self.groupname
 
-    def save(self, *args, **kwargs):
-        self.related_group = SudoUser.objects.get_or_create(
-            username=f"%{self.groupname}")[0] # Tuple (obj, created)
-        super(LnxGroup, self).save(*args, **kwargs)
+    def get_sudo_user_name(self):
+        return f"%{self.groupname}"
+
+    def set_sudo_user(self):
+        self.related_group = SudoUser.objects.create(
+            username=self.get_sudo_user_name())
+
+    def set_sudo_user_name(self):
+        self.related_group.username = self.get_sudo_user_name()
+        self.related_group.save()
 
 
 class LnxUser(models.Model):
-    username = models.CharField(max_length=50,
+    username = models.CharField(max_length=50, unique=True,
         validators=[validate_username]) # uid
     uid_number = models.BigIntegerField(unique=True)
     primary_group = models.ForeignKey(
@@ -61,8 +66,17 @@ class LnxUser(models.Model):
     def __str__(self):
         return self.username
 
+    def get_sudo_user_name(self):
+        return self.username
+
+    def set_sudo_user(self):
+        self.related_user = SudoUser.objects.create(
+            username=self.get_sudo_user_name())
+
+    def set_sudo_user_name(self):
+        self.related_user.username = self.get_sudo_user_name()
+        self.related_user.save()
+
     def save(self, *args, **kwargs):
-        self.related_user = SudoUser.objects.get_or_create(
-            username=self.username)[0] # Tuple (obj, created)
         self.home_dir = path.normpath(self.home_dir)
         super(LnxUser, self).save(*args, **kwargs)
