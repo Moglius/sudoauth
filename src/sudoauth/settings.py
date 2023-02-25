@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'apps.sudoers',
     'apps.lnxusers',
-    'apps.userconfig'
+    'apps.userconfig',
+    'apps.ldapconfig'
 ]
 
 MIDDLEWARE = [

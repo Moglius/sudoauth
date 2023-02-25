@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/sudoers/', include('apps.sudoers.urls')),
     path('api/lnxusers/', include('apps.lnxusers.urls')),
+    path('api/ldapconfig/', include('apps.ldapconfig.urls')),
 ]

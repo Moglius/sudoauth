@@ -51,3 +51,11 @@ def validate_username(value):
             _('%(value)s is not a valid username'),
             params={'value': value},
         )
+
+def validate_host_ip(value):
+    # TODO: IP regex check needed
+    pass
+
+def validate_dn(value):
+    # TODO: validate LDAP dn
+    pass
