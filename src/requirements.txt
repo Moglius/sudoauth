@@ -1,5 +1,9 @@
 asgiref==3.6.0
 Django==4.1.7
 djangorestframework==3.14.0
+dnspython==2.3.0
+pyasn1==0.4.8
+pyasn1-modules==0.2.8
+python-ldap==3.4.3
 pytz==2022.7.1
 sqlparse==0.4.3

@@ -1,7 +1,7 @@
 from django.db import models
 
 from helpers.validators.model_validators import (validate_hostname,
-    validate_username, validate_host_ip, validate_dn)
+    validate_host_ip, validate_dn)
 from helpers.globals.choices import (LDAP_SEARCH_SCOPE,
     ONELEVEL)
 
@@ -32,8 +32,7 @@ class LDAPDn(models.Model):
 class LDAPConfig(models.Model):
     domain_name = models.CharField(max_length=255, unique=True,
         validators=[validate_hostname])
-    ldap_user = models.CharField(max_length=255,
-        validators=[validate_username])
+    ldap_user = models.EmailField(max_length=255)
     krb_auth = models.BooleanField(default=False)
     ldap_password = models.CharField(max_length=255, blank=True,
         null=True)
@@ -44,3 +43,6 @@ class LDAPConfig(models.Model):
 
     def __str__(self):
         return self.domain_name
+    
+    def get_credentials(self):
+        return self.ldap_user, self.ldap_password
