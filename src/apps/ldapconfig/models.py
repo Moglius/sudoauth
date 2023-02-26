@@ -1,3 +1,4 @@
+import ldap
 from django.db import models
 
 from helpers.validators.model_validators import (validate_hostname,
@@ -28,6 +29,9 @@ class LDAPDn(models.Model):
     def __str__(self):
         return self.dn
 
+    def get_scope(self):
+        return ldap.SCOPE_ONELEVEL if self.scope == 'OL' else ldap.SCOPE_SUBTREE
+
 
 class LDAPConfig(models.Model):
     domain_name = models.CharField(max_length=255, unique=True,
@@ -43,6 +47,12 @@ class LDAPConfig(models.Model):
 
     def __str__(self):
         return self.domain_name
-    
+
     def get_credentials(self):
         return self.ldap_user, self.ldap_password
+
+    def get_user_base_dns(self):
+        return self.user_dn.all()
+
+    def get_group_base_dns(self):
+        return self.group_dn.all()

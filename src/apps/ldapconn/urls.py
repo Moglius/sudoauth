@@ -1,7 +1,8 @@
 from django.urls import path, include
 
-from .views import LDAPUserView
+from .views import LDAPUserView, LDAPGroupView
 
 urlpatterns = [
-    path('', LDAPUserView.as_view(), name='ldapusers')
+    path('users/', LDAPUserView.as_view(), name='ldapusers'),
+    path('groups/', LDAPGroupView.as_view(), name='ldapgroups')
 ]

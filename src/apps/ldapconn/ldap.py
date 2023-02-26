@@ -1,6 +1,5 @@
 import ldap
 
-from .models import LDAPUser
 from apps.ldapconfig.models import LDAPConfig
 from .discovery import DNSService
 
@@ -33,7 +32,7 @@ def modify_user():
 
 class LDAPObjectsService():
 
-    def __new__(cls):
+    def __new__(cls, ldap_obj_class):
         if not hasattr(cls, 'instance'):
             cls.instance = super(LDAPObjectsService, cls).__new__(cls)
         return cls.instance
@@ -44,7 +43,7 @@ class LDAPObjectsService():
 
     def _get_credentials(self):
         ldap_config = LDAPConfig.objects.first()
-        return ldap_config.get_credentials()
+        return self.ldap_config.get_credentials()
 
     def _init_connection(self):
         server = self._get_ldap_servers()[0]
@@ -54,35 +53,40 @@ class LDAPObjectsService():
         connect.simple_bind_s(user, passwd)
         return connect
 
-    def __init__(self):
+    def __init__(self, ldap_obj_class):
+        self.ldap_config = LDAPConfig.objects.first()
         self.connection = self._init_connection()
-        self.ldap_control = ldap.controls.SimplePagedResultsControl(
-            criticality=False,
-            size=1000,
-            cookie='',
-        )
+        self.filterstr = ldap_obj_class.get_objectclass_filter()
+        self.attrlist = ldap_obj_class.get_attributes_list()
+        self.return_class = ldap_obj_class
 
-    def _perform_search(self):
+    def _get_dn_to_search(self):
+        return self.return_class.get_dn_to_search(self.ldap_config)
 
-        BASE_DN = 'CN=Users,DC=localdomain,DC=com'
-        OBJECT_TO_SEARCH = "(&(objectClass=Person)(userPrincipalName=*))"
-        ATTRIBUTES_TO_SEARCH = ['gidNumber', 'userPrincipalName']
+    def _ldap_search(self, base_dn, ctrl):
 
         msgid = self.connection.search_ext(
-            base=BASE_DN,
-            scope=ldap.SCOPE_ONELEVEL,
-            filterstr=OBJECT_TO_SEARCH,
-            attrlist=ATTRIBUTES_TO_SEARCH,
-            serverctrls=[self.ldap_control],
+            base=base_dn.dn,
+            scope=base_dn.get_scope(),
+            filterstr=self.filterstr,
+            attrlist=['*'],
+            serverctrls=[ctrl],
             timeout=5
         )
 
-        _res_type, results, _res_msgid, server_controls = self.connection.result3(
+        _r_type, res, _r_mid, srv_crtls = self.connection.result3(
             msgid,
             timeout=5,
         )
+        return res, srv_crtls
 
-        return results, server_controls
+    def _perform_search(self, res, search_dname):
+
+        for base_dn in search_dname:
+            pk = base_dn.pk
+            res[pk]['res'], res[pk]['ctrl'] = self._ldap_search(base_dn, res[pk]['cookie'])
+
+        return res
 
     def _get_page_control(self, server_controls):
         output = None
@@ -92,20 +96,49 @@ class LDAPObjectsService():
         return output
 
     def _create_return_object(self, d_name, attrs):
-        return LDAPUser(d_name, attrs['userPrincipalName'][0].decode('utf-8'))
+        return self.return_class(d_name, attrs)
+
+    def _more_ldap_pages(self, search_res):
+        for ldap_search in search_res.values():
+            page_crtl = self._get_page_control(ldap_search['ctrl'])
+            if page_crtl.cookie: return True
+        return False
+
+    def _set_cookie(self, search_res):
+        for ldap_search in search_res:
+            page_crtl = self._get_page_control(ldap_search['ctrl'])
+            if page_crtl.cookie: 
+                ldap_search['cookie'].cookie = page_crtl.cookie
+
+    def _create_working_dictionary(self, search_dname):
+
+        res = {}
+        for base_dn in search_dname:
+            pk = base_dn.pk
+            res[pk] = {}
+            res[pk]['cookie'] = ldap.controls.SimplePagedResultsControl(
+                criticality=False,
+                size=1000,
+                cookie='',
+            )
+            res[pk]['res'], res[pk]['ctrl'] = None, None
+        return res
 
     def get_objects(self):
 
+        search_dname = self._get_dn_to_search()
+        search_res = self._create_working_dictionary(search_dname)
+
         while True:
 
-            results, server_controls = self._perform_search()
+            self._perform_search(search_res, search_dname)
 
-            for d_name, attrs in results:
-                if d_name is not None:
-                    yield self._create_return_object(d_name, attrs)
+            for search in search_res.values():
+                for d_name, attrs in search['res']:
+                    if d_name is not None:
+                        yield self._create_return_object(d_name, attrs)
 
-            page_control = self._get_page_control(server_controls)
-            if page_control.cookie:
-                self.ldap_control.cookie = page_control.cookie
+            if self._more_ldap_pages(search_res):
+                self._set_cookie(search_res)
             else:
                 break
