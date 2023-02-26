@@ -54,7 +54,7 @@ class LDAPGroup:
     @classmethod
     def get_dn_to_search(cls, ldap_config):
         return ldap_config.get_group_base_dns()
-    
+
     def get_list_to_compare(self):
         return [self.distinguishedName.lower(), self.cn.lower(),
                 self.sAMAccountName.lower()]
