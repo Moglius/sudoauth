@@ -1,7 +1,11 @@
 import ldap
+import ldap.modlist as modlist
 
 from apps.ldapconfig.models import LDAPConfig
 from .discovery import DNSService
+
+# Autofs:
+# https://ovalousek.wordpress.com/2015/08/03/autofs/
 
 
 LDAP_SERVER = 'ldap://192.168.0.44'
@@ -25,9 +29,40 @@ def modify_user():
 
     dn = result[0][0]
 
-    mod_attrs = [( ldap.MOD_REPLACE, "gidNumber", gidnumber.encode('utf-8'))]
+    mod_attrs = [( ldap.MOD_REPLACE, "gidNumber", gidnumber.encode('utf-8')),
+                 ( ldap.MOD_REPLACE, "uidNumber", gidnumber.encode('utf-8')),
+                 ( ldap.MOD_REPLACE, "gecos", b'syncuser'),
+                 ( ldap.MOD_REPLACE, "homeDirectory", b'/home/syncuser'),
+                 ( ldap.MOD_REPLACE, "loginShell", b'/usr/bin/bash')]
 
     connect.modify_s(dn, mod_attrs)
+
+def create_sudo_rule():
+
+    dn = "cn=RITM2312312,ou=sudo,dc=localdomain,dc=com"
+
+    attrs = {}
+    attrs['cn'] = b'RITM2312312'
+    attrs['objectclass'] = [
+        b'top',
+        b'sudoRole',
+    ]
+    attrs['sudoOption'] = b'!authenticate'
+    attrs['sudoRunAs'] = b'root'
+    attrs['sudoRunAsGroup'] = b'root'
+    attrs['sudoRunAsUser'] = b'root'
+
+    attrs['sudoUser'] = b'syncuser'
+    attrs['sudoCommand'] = b'/bin/dmidecode -q 1'
+    attrs['sudoHost'] = b'host1.localdomain.com'
+
+    connect = ldap.initialize(LDAP_SERVER)
+    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
+    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
+
+    ldif = modlist.addModlist(attrs)
+    connect.add_s(dn, ldif)
+    connect.unbind_s()
 
 
 class LDAPObjectsService():

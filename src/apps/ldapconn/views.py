@@ -1,8 +1,16 @@
 from rest_framework import generics
 from .serializers import (LDAPUserSerializer,
     LDAPGroupSerializer)
-from .ldap import LDAPObjectsService
+from .ldap import LDAPObjectsService, create_sudo_rule, modify_user
 from .models import LDAPUser, LDAPGroup
+from django.http import JsonResponse
+
+
+
+def create_sudo_rule_view(request):
+    #create_sudo_rule()
+    modify_user()
+    return JsonResponse({"hola": "hello world!"})
 
 
 class LDAPUserView(generics.ListAPIView):
