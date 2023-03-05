@@ -1,8 +1,11 @@
 import ldap
 import ldap.modlist as modlist
+import struct, binascii
 
 from apps.ldapconfig.models import LDAPConfig
 from .discovery import DNSService
+from django.http import Http404
+
 
 # Autofs:
 # https://ovalousek.wordpress.com/2015/08/03/autofs/
@@ -12,6 +15,52 @@ LDAP_SERVER = 'ldap://192.168.0.44'
 BASE_DN = 'dc=localdomain,dc=com'  # base dn to search in
 LDAP_LOGIN = 'syncuser@localdomain.com'
 LDAP_PASSWORD = "Vyq59[Tc/?6k4bT2]%aE"
+
+def guid2hexstring(val):
+    s = ['\\%02X' % ord(x) for x in val]
+    return ''.join(s)
+
+
+def search_by_sid():
+
+    OBJECT_TO_SEARCH = "objectSid=S-1-5-21-3541430928-2051711210-1391384369-1108"
+    ATTRIBUTES_TO_SEARCH = ['*']
+
+    connect = ldap.initialize(LDAP_SERVER)
+    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
+    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
+    result = connect.search_s(BASE_DN, ldap.SCOPE_SUBTREE, OBJECT_TO_SEARCH, ATTRIBUTES_TO_SEARCH)
+
+    guid = result[0][1]['objectGUID'][0]
+
+    guid = binascii.hexlify(guid).decode('utf-8')
+    print(guid)
+
+    guid = ''.join(['\\%s' % guid[i:i+2] for i in range(0, len(guid), 2)])
+    print(guid)
+
+    OBJECT_TO_SEARCH = f"(objectGUID={guid})"
+    ATTRIBUTES_TO_SEARCH = ['*']
+
+    connect = ldap.initialize(LDAP_SERVER)
+    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
+    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
+    result2 = connect.search_s(BASE_DN, ldap.SCOPE_SUBTREE, OBJECT_TO_SEARCH, ATTRIBUTES_TO_SEARCH)
+    print('-------------------')
+    print(result2[0])
+    print('-------------------')
+
+def search_by_guid():
+
+    OBJECT_TO_SEARCH = "(objectGUID=1556461e48de4821a4ba62b0df60363a)"
+    ATTRIBUTES_TO_SEARCH = ['*']
+
+    connect = ldap.initialize(LDAP_SERVER)
+    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
+    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
+    result = connect.search_s(BASE_DN, ldap.SCOPE_SUBTREE, OBJECT_TO_SEARCH, ATTRIBUTES_TO_SEARCH)
+
+    print(result[0])
 
 
 def modify_user():
@@ -123,6 +172,24 @@ class LDAPObjectsService():
 
         return res
 
+    def _ldap_search_by_guid(self, base_dn, guid):
+        guid = ''.join([f"\\{guid[i:i+2]}" for i in range(0, len(guid), 2)])
+
+        for dn in base_dn:
+            try:
+                result = self.connection.search_s(dn.dn, dn.get_scope(),
+                    f"objectGUID={guid}", ['*'])
+            except Exception as exc:
+                raise Http404 from exc
+            if result:
+                break
+
+        return result
+
+    def _perform_search_by_guid(self, search_dname, guid):
+        result = self._ldap_search_by_guid(search_dname, guid)
+        return result[0]
+
     def _get_page_control(self, server_controls):
         output = None
         for ctrl in server_controls:
@@ -177,3 +244,9 @@ class LDAPObjectsService():
                 self._set_cookie(search_res)
             else:
                 break
+
+    def get_object(self, guid):
+
+        search_dname = self._get_dn_to_search()
+        result = self._perform_search_by_guid(search_dname, guid)
+        return self._create_return_object(result[0], result[1])

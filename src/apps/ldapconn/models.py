@@ -1,15 +1,69 @@
+import struct, uuid, binascii
+
+
+class LDAPHelper:
+
+    def _get_ldap_values(self, attrs_val):
+        if len(attrs_val) > 1:
+            return [val.decode('utf-8') for val in attrs_val]
+        else:
+            return attrs_val[0].decode('utf-8')
+
+    def get_attributes(self, attrs, key):
+        if key in attrs:
+            output = self._get_ldap_values(attrs[key])
+        else:
+            output = 'N/A'
+        return output
+
+    def _sid_to_string(self, binary):
+        version = struct.unpack('B', binary[0:1])[0]
+        # I do not know how to treat version != 1 (it does not exist yet)
+        assert version == 1, version
+        length = struct.unpack('B', binary[1:2])[0]
+        authority = struct.unpack(b'>Q', b'\x00\x00' + binary[2:8])[0]
+        string = f"S-{version}-{authority}"
+        binary = binary[8:]
+        assert len(binary) == 4 * length
+        for i in range(length):
+            value = struct.unpack('<L', binary[4*i:4*(i+1)])[0]
+            string += f"-{value}"
+        return string
+
+    def get_sid(self, attrs, key):
+        if key in attrs:
+            return self._sid_to_string(attrs[key][0])
+        else:
+            return 'N/A'
+
+    def get_guid(self, attrs, key):
+        if key in attrs:
+            val = uuid.UUID(bytes_le=attrs[key][0])
+            return str(val).lower()
+        else:
+            return 'N/A'
+
+    def get_guid_hex(self, attrs, key):
+        if key in attrs:
+            return binascii.hexlify(attrs[key][0]).decode('utf-8')
+        else:
+            return 'N/A'
 
 
 class LDAPUser:
 
     def __init__(self, dn, attrs):
+        helper = LDAPHelper()
         self.distinguishedName = dn
-        self.name = attrs['name'][0].decode('utf-8')
-        self.userPrincipalName = attrs['userPrincipalName'][0].decode('utf-8')
-        self.cn = attrs['cn'][0].decode('utf-8')
-        self.sAMAccountName = attrs['sAMAccountName'][0].decode('utf-8')
-        self.givenName = attrs['givenName'][0].decode('utf-8')
-        self.sn = attrs['sn'][0].decode('utf-8')
+        self.name = helper.get_attributes(attrs, 'name')
+        self.userPrincipalName = helper.get_attributes(attrs, 'userPrincipalName')
+        self.cn = helper.get_attributes(attrs, 'cn')
+        self.sAMAccountName = helper.get_attributes(attrs, 'sAMAccountName')
+        self.givenName = helper.get_attributes(attrs, 'givenName')
+        self.sn = helper.get_attributes(attrs, 'sn')
+        self.objectSid = helper.get_sid(attrs, 'objectSid')
+        self.objectGUID = helper.get_guid(attrs, 'objectGUID')
+        self.objectGUIDHex = helper.get_guid_hex(attrs, 'objectGUID')
 
     @classmethod
     def get_objectclass_filter(cls):
@@ -31,16 +85,17 @@ class LDAPUser:
 
 class LDAPGroup:
 
-    def _get_attributes(self, attrs, key):
-        return attrs[key][0].decode('utf-8') if key in attrs else 'N/A'
-
     def __init__(self, dn, attrs):
+        helper = LDAPHelper()
         self.distinguishedName = dn
-        self.sAMAccountName = attrs['sAMAccountName'][0].decode('utf-8')
-        self.cn = attrs['cn'][0].decode('utf-8')
-        self.description = attrs['description'][0].decode('utf-8')
-        self.member = self._get_attributes(attrs, 'member')
-        self.memberOf = self._get_attributes(attrs, 'memberOf')
+        self.sAMAccountName = helper.get_attributes(attrs, 'sAMAccountName')
+        self.cn = helper.get_attributes(attrs, 'cn')
+        self.description = helper.get_attributes(attrs, 'description')
+        self.member = helper.get_attributes(attrs, 'member')
+        self.memberOf = helper.get_attributes(attrs, 'memberOf')
+        self.objectSid = helper.get_sid(attrs, 'objectSid')
+        self.objectGUID = helper.get_guid(attrs, 'objectGUID')
+        self.objectGUIDHex = helper.get_guid_hex(attrs, 'objectGUID')
 
 
     @classmethod
