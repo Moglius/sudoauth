@@ -3,17 +3,26 @@ import struct, uuid, binascii
 
 class LDAPHelper:
 
-    def _get_ldap_values(self, attrs_val):
-        if len(attrs_val) > 1:
+    list_fields = (
+        'member',
+        'memberOf',
+        'sudoCommand',
+        'sudoHost',
+        'sudoOption',
+        'sudoUser',
+    )
+
+    def _get_ldap_values(self, attrs_val, key):
+        if len(attrs_val) > 1 or key in self.list_fields:
             return [val.decode('utf-8') for val in attrs_val]
         else:
             return attrs_val[0].decode('utf-8')
 
     def get_attributes(self, attrs, key):
         if key in attrs:
-            output = self._get_ldap_values(attrs[key])
+            output = self._get_ldap_values(attrs[key], key)
         else:
-            output = 'N/A'
+            output = ''
         return output
 
     def _sid_to_string(self, binary):
@@ -117,3 +126,38 @@ class LDAPGroup:
     def apply_filter(self, filter_str):
         filter_str = filter_str.lower()
         return any(filter_str in word for word in self.get_list_to_compare())
+
+
+class LDAPSudoRule:
+
+    def __init__(self, dn, attrs):
+        helper = LDAPHelper()
+        self.distinguishedName = dn
+        self.name = helper.get_attributes(attrs, 'name')
+        self.cn = helper.get_attributes(attrs, 'cn')
+        self.description = helper.get_attributes(attrs, 'description')
+        self.sudoCommand = helper.get_attributes(attrs, 'sudoCommand')
+        self.sudoHost = helper.get_attributes(attrs, 'sudoHost')
+        self.sudoOption = helper.get_attributes(attrs, 'sudoOption')
+        self.sudoRunAsUser = helper.get_attributes(attrs, 'sudoRunAsUser')
+        self.sudoRunAsGroup = helper.get_attributes(attrs, 'sudoRunAsGroup')
+        self.sudoUser = helper.get_attributes(attrs, 'sudoUser')
+        self.objectGUID = helper.get_guid(attrs, 'objectGUID')
+        self.objectGUIDHex = helper.get_guid_hex(attrs, 'objectGUID')
+
+
+    @classmethod
+    def get_objectclass_filter(cls):
+        return "(objectClass=sudoRole)"
+
+    @classmethod
+    def get_attributes_list(cls):
+        return ['*']
+
+    @classmethod
+    def get_dn_to_search(cls, ldap_config):
+        return ldap_config.get_sudo_base_dns()
+
+    def apply_filter(self, filter_str):
+        return (filter_str in self.name or
+            any(filter_str in word for word in self.sudoCommand))

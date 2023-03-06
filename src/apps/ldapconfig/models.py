@@ -44,6 +44,11 @@ class LDAPConfig(models.Model):
     user_dn = models.ManyToManyField(LDAPDn)
     group_dn = models.ManyToManyField(LDAPDn,
         related_name='group_ldapconfig_set')
+    sudo_dn = models.ForeignKey(
+        LDAPDn,
+        related_name='sudo_config_set',
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.domain_name
@@ -56,3 +61,6 @@ class LDAPConfig(models.Model):
 
     def get_group_base_dns(self):
         return self.group_dn.all()
+
+    def get_sudo_base_dns(self):
+        return [self.sudo_dn]

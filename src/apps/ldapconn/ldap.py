@@ -1,10 +1,10 @@
+import binascii
 import ldap
 import ldap.modlist as modlist
-import struct, binascii
+from django.http import Http404
 
 from apps.ldapconfig.models import LDAPConfig
 from .discovery import DNSService
-from django.http import Http404
 
 
 # Autofs:
@@ -88,10 +88,10 @@ def modify_user():
 
 def create_sudo_rule():
 
-    dn = "cn=RITM2312312,ou=sudo,dc=localdomain,dc=com"
+    dn = "cn=RITM23123124,ou=sudo,dc=localdomain,dc=com"
 
     attrs = {}
-    attrs['cn'] = b'RITM2312312'
+    attrs['cn'] = b'RITM23123124'
     attrs['objectclass'] = [
         b'top',
         b'sudoRole',
@@ -101,9 +101,9 @@ def create_sudo_rule():
     attrs['sudoRunAsGroup'] = b'root'
     attrs['sudoRunAsUser'] = b'root'
 
-    attrs['sudoUser'] = b'syncuser'
-    attrs['sudoCommand'] = b'/bin/dmidecode -q 1'
-    attrs['sudoHost'] = b'host1.localdomain.com'
+    attrs['sudoUser'] = [b'syncuser', b'%syncgroup']
+    attrs['sudoCommand'] = [b'/bin/dmidecode -q 1', b'/bin/tail -f /var/log/secure']
+    attrs['sudoHost'] = [b'host1.localdomain.com', b'host2.localdomain.com']
 
     connect = ldap.initialize(LDAP_SERVER)
     connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
@@ -126,7 +126,6 @@ class LDAPObjectsService():
         return dns_service.get_ldap_servers()
 
     def _get_credentials(self):
-        ldap_config = LDAPConfig.objects.first()
         return self.ldap_config.get_credentials()
 
     def _init_connection(self):
