@@ -64,3 +64,16 @@ class LDAPConfig(models.Model):
 
     def get_sudo_base_dns(self):
         return [self.sudo_dn]
+
+'''
+RANGE: get list of not used numbers
+
+start_number = 1  # Initial number in the pool
+end_number = 10  # End number in the pool
+used_numbers = {2, 4}  # Example set of used numbers (get IDs used from DB)
+
+pool = set(range(start_number, end_number + 1))  # Create set of all numbers in the pool
+available_numbers = pool - used_numbers  # Subtract used numbers from pool
+print(available_numbers)  # Output: {1, 3, 5, 6, 7, 8, 9, 10}
+
+'''
