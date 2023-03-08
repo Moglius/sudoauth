@@ -1,4 +1,4 @@
-from rest_framework import generics, viewsets, mixins
+from rest_framework import viewsets, mixins
 from .serializers import (LDAPUserSerializer,
     LDAPGroupSerializer, LDAPSudoRuleSerializer)
 from .ldap import LDAPObjectsService, create_sudo_rule, modify_user, search_by_sid, search_by_guid
@@ -14,7 +14,7 @@ def create_sudo_rule_view(request):
     ''' Test code for sudorule creation and user/groups updates
     '''
     create_sudo_rule()
-    #modify_user()
+    modify_user()
     search_by_sid()
     search_by_guid()
     return JsonResponse({"hola": "hello world!"})
