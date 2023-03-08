@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (LDAPConfig, DNSHost,
-    LDAPDn)
+    LDAPDn, PoolRange)
 
 
 class LDAPConfigAdmin(admin.ModelAdmin):
@@ -12,4 +12,5 @@ class LDAPConfigAdmin(admin.ModelAdmin):
 
 admin.site.register(LDAPConfig, LDAPConfigAdmin)
 admin.site.register(DNSHost)
+admin.site.register(PoolRange)
 admin.site.register(LDAPDn)

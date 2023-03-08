@@ -5,15 +5,35 @@ from .ldap import LDAPObjectsService, create_sudo_rule, modify_user, search_by_s
 from .models import LDAPUser, LDAPGroup, LDAPSudoRule
 from django.http import JsonResponse
 from rest_framework.response import Response
+from apps.ldapconfig.models import LDAPConfig
+from apps.lnxusers.models import LnxUser
+from django.db import transaction
 
 
 def create_sudo_rule_view(request):
+    ''' Test code for sudorule creation and user/groups updates
+    '''
     create_sudo_rule()
     #modify_user()
     search_by_sid()
     search_by_guid()
     return JsonResponse({"hola": "hello world!"})
 
+@transaction.atomic
+def get_notused_id(request):
+    ''' this method will be used to create users and groups with auto 
+        assignment id. Useful for users and groups creation.
+    '''
+
+    ldap_conf = LDAPConfig.objects.first()
+    min_id, max_id = ldap_conf.get_user_min(), ldap_conf.get_user_max()
+    pool = set(range(min_id, max_id + 1)) # large pools not accepted, limit the range <= 1Millon
+
+    used_ids = set(LnxUser.objects.values_list('uid_number', flat=True))
+
+    available_numbers = pool - used_ids  # Subtract used numbers from pool
+
+    return JsonResponse({"free_id": available_numbers.pop()})
 
 class ListRetrieveViewSet(mixins.ListModelMixin,
     mixins.RetrieveModelMixin, viewsets.GenericViewSet):
