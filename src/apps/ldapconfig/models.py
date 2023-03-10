@@ -97,3 +97,9 @@ class LDAPConfig(models.Model):
     
     def get_user_max(self):
         return self.users_pool.pool_max
+    
+    def get_user_defaults(self):
+        return {
+            "primary_group": 1231232, # TODO: get this from this model
+            "shell": '/bin/bash' # TODO: get this from this model
+        }

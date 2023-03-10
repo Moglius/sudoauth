@@ -225,6 +225,13 @@ class LDAPObjectsService():
             res[pk]['res'], res[pk]['ctrl'] = None, None
         return res
 
+    def _perform_create(self, dn, entry_defaults, guid):
+        ''' CODE RUN in a Transaction
+        TODO: get next number from pool, assign defaults
+            modify ldap entry, create DB entry with guid
+        '''
+        return
+
     def get_objects(self):
 
         search_dname = self._get_dn_to_search()
@@ -249,3 +256,11 @@ class LDAPObjectsService():
         search_dname = self._get_dn_to_search()
         result = self._perform_search_by_guid(search_dname, guid)
         return self._create_return_object(result[0], result[1])
+    
+    def create_object(self, guid):
+
+        search_dname = self._get_dn_to_search()
+        dn, attrs = self._perform_search_by_guid(search_dname, guid)
+        entry_defaults = self.return_class.get_defaults(self.ldap_config)
+        self._perform_create(dn, entry_defaults, guid)
+        return 'user'

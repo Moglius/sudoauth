@@ -86,6 +86,10 @@ class LDAPUser:
     def get_dn_to_search(cls, ldap_config):
         return ldap_config.get_user_base_dns()
 
+    @classmethod
+    def get_defaults(cls, ldap_config):
+        return ldap_config.get_user_defaults()
+
 
     def apply_filter(self, filter_str):
         return (filter_str in self.distinguishedName or

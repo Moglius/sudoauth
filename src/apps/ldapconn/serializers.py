@@ -50,3 +50,7 @@ class LDAPSudoRuleSerializer(serializers.Serializer):
     )
     objectGUID = serializers.CharField(max_length=255)
     objectGUIDHex = serializers.CharField(max_length=255)
+
+
+class LDAPUserCreationSerializer(serializers.Serializer):
+    objectGUIDHex = serializers.CharField(max_length=255)

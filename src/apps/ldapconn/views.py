@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins
 from .serializers import (LDAPUserSerializer,
-    LDAPGroupSerializer, LDAPSudoRuleSerializer)
+    LDAPGroupSerializer, LDAPSudoRuleSerializer, LDAPUserCreationSerializer)
 from .ldap import LDAPObjectsService, create_sudo_rule, modify_user, search_by_sid, search_by_guid
 from .models import LDAPUser, LDAPGroup, LDAPSudoRule
 from django.http import JsonResponse
@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from apps.ldapconfig.models import LDAPConfig
 from apps.lnxusers.models import LnxUser
 from django.db import transaction
+from rest_framework import status
 
 
 def create_sudo_rule_view(request):
@@ -36,7 +37,8 @@ def get_notused_id(request):
     return JsonResponse({"free_id": available_numbers.pop()})
 
 class ListRetrieveViewSet(mixins.ListModelMixin,
-    mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    mixins.RetrieveModelMixin, mixins.CreateModelMixin,
+    viewsets.GenericViewSet):
     pass
 
 
@@ -57,6 +59,14 @@ class LDAPUserViewSet(ListRetrieveViewSet):
         user = ldap_service.get_object(pk)
         serializer = LDAPUserSerializer(user)
         return Response(serializer.data)
+
+    def create(self, request, *args, pk=None, **kwargs):
+        ldap_service = LDAPObjectsService(LDAPUser)
+        serializer = LDAPUserCreationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = ldap_service.create_object(serializer.data['objectGUIDHex'])
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LDAPGroupViewSet(ListRetrieveViewSet):
