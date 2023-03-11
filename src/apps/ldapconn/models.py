@@ -1,4 +1,7 @@
-import struct, uuid, binascii
+import struct, uuid, binascii, ldap
+
+from django.db import transaction
+from apps.lnxusers.models import LnxUser, LnxGroup, LnxShell
 
 
 class LDAPHelper:
@@ -75,7 +78,9 @@ class LDAPUser:
         self.objectGUIDHex = helper.get_guid_hex(attrs, 'objectGUID')
 
     @classmethod
-    def get_objectclass_filter(cls):
+    def get_objectclass_filter(cls, guid=None):
+        if guid:
+            return f"(&(objectClass=Person)(userPrincipalName=*)(objectGUID={guid}))"
         return "(&(objectClass=Person)(userPrincipalName=*))"
 
     @classmethod
@@ -87,9 +92,52 @@ class LDAPUser:
         return ldap_config.get_user_base_dns()
 
     @classmethod
-    def get_defaults(cls, ldap_config):
-        return ldap_config.get_user_defaults()
+    def get_defaults(cls, ldap_config, attrs):
+        return ldap_config.get_user_defaults(attrs)
 
+    @classmethod
+    def _get_free_id(cls, ldap_config):
+        min_id, max_id = ldap_config.get_user_min(), ldap_config.get_user_max()
+        pool = set(range(min_id, max_id + 1)) # large pools not accepted
+
+        used_ids = set(LnxUser.objects.values_list('uid_number', flat=True))
+
+        available_uids = pool - used_ids  # Subtract used numbers from pool
+        return str(available_uids.pop()).encode('utf-8')
+
+    @classmethod
+    def _modify_ldap_entry(cls, ldap_conn, entry_defaults, free_uid, dn):
+        mod_attrs = [
+            ( ldap.MOD_REPLACE, "gidNumber", entry_defaults['gidNumber']),
+            ( ldap.MOD_REPLACE, "uidNumber", free_uid),
+            ( ldap.MOD_REPLACE, "gecos", entry_defaults['gecos']),
+            ( ldap.MOD_REPLACE, "homeDirectory", entry_defaults['homeDirectory']),
+            ( ldap.MOD_REPLACE, "loginShell", entry_defaults['loginShell'])
+        ]
+
+        ldap_conn.modify_s(dn, mod_attrs)
+
+    @classmethod
+    def _create_db_entry(cls, entry_defaults, guid, free_uid):
+        primary_group = LnxGroup.objects.get(
+            gid_number=int(entry_defaults['gidNumber'].decode('utf-8')))
+        shell = LnxShell.objects.get(
+            shell=entry_defaults['loginShell'].decode('utf-8'))
+        LnxUser.objects.create(
+            username=entry_defaults['uid'].decode('utf-8'),
+            uid_number=int(free_uid),
+            primary_group=primary_group,
+            login_shell=shell,
+            home_dir=entry_defaults['homeDirectory'].decode('utf-8'),
+            gecos=entry_defaults['gecos'].decode('utf-8')
+        )
+
+    @classmethod
+    @transaction.atomic
+    def perform_create(cls, ldap_config, ldap_conn, dn, entry_defaults, guid):
+        free_uid = cls._get_free_id(ldap_config)
+        cls._create_db_entry(entry_defaults, guid, free_uid)
+        cls._modify_ldap_entry(ldap_conn, entry_defaults, free_uid, dn)
 
     def apply_filter(self, filter_str):
         return (filter_str in self.distinguishedName or
@@ -112,7 +160,9 @@ class LDAPGroup:
 
 
     @classmethod
-    def get_objectclass_filter(cls):
+    def get_objectclass_filter(cls, guid=None):
+        if guid:
+            return f"(&(objectClass=Group)(objectGUID={guid}))"
         return "(objectClass=Group)"
 
     @classmethod
@@ -126,6 +176,42 @@ class LDAPGroup:
     def get_list_to_compare(self):
         return [self.distinguishedName.lower(), self.cn.lower(),
                 self.sAMAccountName.lower()]
+
+    @classmethod
+    def get_defaults(cls, ldap_config, attrs):
+        return ldap_config.get_group_defaults(attrs)
+
+    @classmethod
+    def _get_free_id(cls, ldap_config):
+        min_id, max_id = ldap_config.get_group_min(), ldap_config.get_group_max()
+        pool = set(range(min_id, max_id + 1)) # large pools not accepted: >1M
+
+        used_ids = set(LnxGroup.objects.values_list('gid_number', flat=True))
+
+        available_uids = pool - used_ids  # Subtract used numbers from pool
+        return str(available_uids.pop()).encode('utf-8')
+
+    @classmethod
+    def _modify_ldap_entry(cls, ldap_conn, free_gid, dn):
+        mod_attrs = [
+            ( ldap.MOD_REPLACE, "gidNumber", free_gid)
+        ]
+
+        ldap_conn.modify_s(dn, mod_attrs)
+
+    @classmethod
+    def _create_db_entry(cls, entry_defaults, guid, free_gid):
+        LnxGroup.objects.create(
+            groupname=entry_defaults['sAMAccountName'].decode('utf-8'),
+            gid_number=int(free_gid)
+        )
+
+    @classmethod
+    @transaction.atomic
+    def perform_create(cls, ldap_config, ldap_conn, dn, entry_defaults, guid):
+        free_gid = cls._get_free_id(ldap_config)
+        cls._create_db_entry(entry_defaults, guid, free_gid)
+        cls._modify_ldap_entry(ldap_conn, free_gid, dn)
 
     def apply_filter(self, filter_str):
         filter_str = filter_str.lower()

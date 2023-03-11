@@ -12,6 +12,17 @@ class SudoUser(models.Model):
     def __str__(self):
         return self.username
 
+    @classmethod
+    def get_instance(cls, username):
+        return cls.objects.get(username=username['username'])
+
+    @classmethod
+    def get_instances(cls, sudo_users) -> list:
+        return_list = []
+        for sudo_user in sudo_users:
+            return_list.append(cls.objects.get(username=sudo_user['username']))
+        return return_list
+
 
 class SudoHost(models.Model):
 
@@ -21,16 +32,30 @@ class SudoHost(models.Model):
     def __str__(self):
         return self.hostname
 
+    @classmethod
+    def get_instances(cls, sudo_hosts) -> list:
+        return_list = []
+        for sudo_host in sudo_hosts:
+            return_list.append(cls.objects.get(hostname=sudo_host['hostname']))
+        return return_list
+
 
 class SudoCommand(models.Model):
 
     command = models.CharField(max_length=255,
         validators=[validate_path])
-    args = models.CharField(max_length=255)
+    args = models.CharField(max_length=255, blank=True)
     diggest = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"{self.diggest} {self.command}" if self.diggest else self.command
+
+    @classmethod
+    def get_instances(cls, sudo_commands) -> list:
+        return_list = []
+        for sudo_command in sudo_commands:
+            return_list.append(cls.objects.get(command=sudo_command['command']))
+        return return_list
 
 
 class SudoRule(models.Model):

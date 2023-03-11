@@ -176,14 +176,19 @@ class LDAPObjectsService():
 
         for dn in base_dn:
             try:
-                result = self.connection.search_s(dn.dn, dn.get_scope(),
-                    f"objectGUID={guid}", ['*'])
+                result = self.connection.search_s(
+                    base=dn.dn, 
+                    scope=dn.get_scope(),
+                    filterstr=self.return_class.get_objectclass_filter(guid),
+                    attrlist=['*'])
             except Exception as exc:
                 raise Http404 from exc
             if result:
                 break
 
-        return result
+        if result:
+            return result
+        raise Http404
 
     def _perform_search_by_guid(self, search_dname, guid):
         result = self._ldap_search_by_guid(search_dname, guid)
@@ -208,7 +213,7 @@ class LDAPObjectsService():
     def _set_cookie(self, search_res):
         for ldap_search in search_res:
             page_crtl = self._get_page_control(ldap_search['ctrl'])
-            if page_crtl.cookie: 
+            if page_crtl.cookie:
                 ldap_search['cookie'].cookie = page_crtl.cookie
 
     def _create_working_dictionary(self, search_dname):
@@ -224,13 +229,6 @@ class LDAPObjectsService():
             )
             res[pk]['res'], res[pk]['ctrl'] = None, None
         return res
-
-    def _perform_create(self, dn, entry_defaults, guid):
-        ''' CODE RUN in a Transaction
-        TODO: get next number from pool, assign defaults
-            modify ldap entry, create DB entry with guid
-        '''
-        return
 
     def get_objects(self):
 
@@ -254,13 +252,14 @@ class LDAPObjectsService():
     def get_object(self, guid):
 
         search_dname = self._get_dn_to_search()
-        result = self._perform_search_by_guid(search_dname, guid)
-        return self._create_return_object(result[0], result[1])
-    
+        dn, attrs = self._perform_search_by_guid(search_dname, guid)
+        return self._create_return_object(dn, attrs)
+
     def create_object(self, guid):
 
         search_dname = self._get_dn_to_search()
         dn, attrs = self._perform_search_by_guid(search_dname, guid)
-        entry_defaults = self.return_class.get_defaults(self.ldap_config)
-        self._perform_create(dn, entry_defaults, guid)
-        return 'user'
+        entry_defaults = self.return_class.get_defaults(self.ldap_config, attrs)
+        self.return_class.perform_create(self.ldap_config, self.connection,
+            dn, entry_defaults, guid)
+        return self._create_return_object(dn, attrs)

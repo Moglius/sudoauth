@@ -7,6 +7,8 @@ from helpers.validators.model_validators import (validate_hostname,
 from helpers.globals.choices import (LDAP_SEARCH_SCOPE,
     ONELEVEL)
 
+from apps.lnxusers.models import LnxGroup, LnxShell
+
 
 class DNSHost(models.Model):
 
@@ -76,6 +78,18 @@ class LDAPConfig(models.Model):
         related_name='config_group_pool_set',
         on_delete=models.CASCADE
     )
+    default_group = models.ForeignKey(
+        LnxGroup,
+        default=1,
+        related_name='defaul_group_set',
+        on_delete=models.CASCADE
+    )
+    default_shell = models.ForeignKey(
+        LnxShell,
+        default=1,
+        related_name='defaul_shell_set',
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.domain_name
@@ -94,12 +108,27 @@ class LDAPConfig(models.Model):
 
     def get_user_min(self):
         return self.users_pool.pool_min
-    
+
     def get_user_max(self):
         return self.users_pool.pool_max
     
-    def get_user_defaults(self):
+    def get_group_min(self):
+        return self.groups_pool.pool_min
+
+    def get_group_max(self):
+        return self.groups_pool.pool_max
+
+    def get_user_defaults(self, attrs):
+        username = attrs['sAMAccountName'][0].decode('utf-8')
         return {
-            "primary_group": 1231232, # TODO: get this from this model
-            "shell": '/bin/bash' # TODO: get this from this model
+            "homeDirectory": f"/home/{username}".encode('utf-8'),
+            "gidNumber": self.default_group.get_gid_number().encode('utf-8'),
+            "loginShell": self.default_shell.get_shell_name().encode('utf-8'),
+            "gecos": attrs['displayName'][0],
+            "uid": attrs['sAMAccountName'][0]
+        }
+
+    def get_group_defaults(self, attrs):
+        return {
+            "sAMAccountName": attrs['sAMAccountName'][0]
         }

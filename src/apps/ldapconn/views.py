@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins
-from .serializers import (LDAPUserSerializer,
-    LDAPGroupSerializer, LDAPSudoRuleSerializer, LDAPUserCreationSerializer)
+from .serializers import (LDAPUserSerializer, LDAPUserGroupCreationSerializer,
+    LDAPGroupSerializer, LDAPSudoRuleSerializer)
 from .ldap import LDAPObjectsService, create_sudo_rule, modify_user, search_by_sid, search_by_guid
 from .models import LDAPUser, LDAPGroup, LDAPSudoRule
 from django.http import JsonResponse
@@ -36,13 +36,13 @@ def get_notused_id(request):
 
     return JsonResponse({"free_id": available_numbers.pop()})
 
-class ListRetrieveViewSet(mixins.ListModelMixin,
+class LDAPViewSet(mixins.ListModelMixin,
     mixins.RetrieveModelMixin, mixins.CreateModelMixin,
     viewsets.GenericViewSet):
     pass
 
 
-class LDAPUserViewSet(ListRetrieveViewSet):
+class LDAPUserViewSet(LDAPViewSet):
 
     serializer_class = LDAPUserSerializer
 
@@ -60,16 +60,17 @@ class LDAPUserViewSet(ListRetrieveViewSet):
         serializer = LDAPUserSerializer(user)
         return Response(serializer.data)
 
-    def create(self, request, *args, pk=None, **kwargs):
+    def create(self, request, *args, **kwargs):
         ldap_service = LDAPObjectsService(LDAPUser)
-        serializer = LDAPUserCreationSerializer(data=request.data)
+        serializer = LDAPUserGroupCreationSerializer(data=request.data)
         if serializer.is_valid():
             user = ldap_service.create_object(serializer.data['objectGUIDHex'])
-            return Response(serializer.data)
+            serializer = LDAPUserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LDAPGroupViewSet(ListRetrieveViewSet):
+class LDAPGroupViewSet(LDAPViewSet):
 
     serializer_class = LDAPGroupSerializer
 
@@ -87,8 +88,17 @@ class LDAPGroupViewSet(ListRetrieveViewSet):
         serializer = LDAPGroupSerializer(user)
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        ldap_service = LDAPObjectsService(LDAPGroup)
+        serializer = LDAPUserGroupCreationSerializer(data=request.data)
+        if serializer.is_valid():
+            group = ldap_service.create_object(serializer.data['objectGUIDHex'])
+            serializer = LDAPGroupSerializer(group)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LDAPSudoRuleViewSet(ListRetrieveViewSet):
+
+class LDAPSudoRuleViewSet(LDAPViewSet):
 
     serializer_class = LDAPSudoRuleSerializer
 

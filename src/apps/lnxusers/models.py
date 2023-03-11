@@ -16,6 +16,9 @@ class LnxShell(models.Model):
         self.shell = path.normpath(self.shell).lower()
         super(LnxShell, self).save(*args, **kwargs)
 
+    def get_shell_name(self):
+        return self.shell
+
 
 class LnxGroup(models.Model):
     groupname = models.CharField(max_length=65,
@@ -40,6 +43,9 @@ class LnxGroup(models.Model):
     def set_sudo_user_name(self):
         self.related_group.username = self.get_sudo_user_name()
         self.related_group.save()
+
+    def get_gid_number(self):
+        return str(self.gid_number)
 
 
 class LnxUser(models.Model):
