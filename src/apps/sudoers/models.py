@@ -59,7 +59,7 @@ class SudoCommand(models.Model):
 
 
 class SudoRule(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     sudo_user = models.ManyToManyField(SudoUser)
     sudo_host = models.ManyToManyField(SudoHost)
     sudo_command = models.ManyToManyField(SudoCommand)
