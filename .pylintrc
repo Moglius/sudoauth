@@ -426,7 +426,8 @@ disable=raw-checker-failed,
         super-with-arguments,
         missing-function-docstring,
         unused-argument,
-        abstract-method
+        abstract-method,
+        unpacking-non-sequence
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
