@@ -1,6 +1,6 @@
 from os import path
 from django.db import models
-from apps.sudoers.models import SudoUser
+from django.apps import apps
 from helpers.validators.model_validators import (validate_path,
     validate_username)
 
@@ -26,7 +26,7 @@ class LnxGroup(models.Model):
     gid_number = models.BigIntegerField(unique=True)
 
     related_group = models.ForeignKey(
-        SudoUser,
+        'sudoers.SudoUser',
         on_delete=models.CASCADE
     )
 
@@ -37,7 +37,8 @@ class LnxGroup(models.Model):
         return f"%{self.groupname}"
 
     def set_sudo_user(self):
-        self.related_group = SudoUser.objects.create(
+        sudo_user = apps.get_model('sudoers.SudoUser')
+        self.related_group = sudo_user.objects.create(
             username=self.get_sudo_user_name())
 
     def set_sudo_user_name(self):
@@ -65,7 +66,7 @@ class LnxUser(models.Model):
     gecos = models.CharField(max_length=64)
 
     related_user = models.ForeignKey(
-        SudoUser,
+        'sudoers.SudoUser',
         on_delete=models.CASCADE
     )
 
@@ -76,7 +77,8 @@ class LnxUser(models.Model):
         return self.username
 
     def set_sudo_user(self):
-        self.related_user = SudoUser.objects.create(
+        sudo_user = apps.get_model('sudoers.SudoUser')
+        self.related_user = sudo_user.objects.create(
             username=self.get_sudo_user_name())
 
     def set_sudo_user_name(self):

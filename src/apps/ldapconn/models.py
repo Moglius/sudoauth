@@ -1,7 +1,9 @@
 import struct, uuid, binascii, ldap
+import ldap.modlist as modlist
 
 from django.db import transaction
 from apps.lnxusers.models import LnxUser, LnxGroup, LnxShell
+from .ldap import LDAPObjectsService
 
 
 class LDAPHelper:
@@ -237,7 +239,9 @@ class LDAPSudoRule:
 
 
     @classmethod
-    def get_objectclass_filter(cls):
+    def get_objectclass_filter(cls, guid=None):
+        if guid:
+            return f"(&(objectClass=sudoRole)(objectGUID={guid}))"
         return "(objectClass=sudoRole)"
 
     @classmethod
@@ -247,6 +251,52 @@ class LDAPSudoRule:
     @classmethod
     def get_dn_to_search(cls, ldap_config):
         return ldap_config.get_sudo_base_dns()
+
+    @classmethod
+    def create_or_update_sudo_rule(cls, sudo_rule):
+        ldap_service = LDAPObjectsService(LDAPSudoRule)
+        ldap_service.create_object_by_intance(sudo_rule)
+        return sudo_rule
+
+    @classmethod
+    def _create_ldap_mod_attrs(cls, sudo_rule):
+        return [
+            ( ldap.MOD_REPLACE, "sudoRunAs", sudo_rule.run_as_user.username.encode('utf-8')),
+            ( ldap.MOD_REPLACE, "sudoRunAsUser", sudo_rule.run_as_user.username.encode('utf-8')),
+            ( ldap.MOD_REPLACE, "sudoRunAsGroup", sudo_rule.run_as_group.username.encode('utf-8')),
+            ( ldap.MOD_REPLACE, "sudoUser", [user.username.encode('utf-8') for user in sudo_rule.sudo_user.all()]),
+            ( ldap.MOD_REPLACE, "sudoCommand", [command.full_command.encode('utf-8') for command in sudo_rule.sudo_command.all()]),
+            ( ldap.MOD_REPLACE, "sudoHost", [host.hostname.encode('utf-8') for host in sudo_rule.sudo_host.all()]),
+        ]
+
+    @classmethod
+    def _create_ldap_add_attrs(cls, sudo_rule):
+        attrs = {}
+        attrs['objectclass'] = [b'top', b'sudoRole']
+        attrs['cn'] = sudo_rule.name.encode('utf-8')
+        attrs['sudoRunAs'] = sudo_rule.run_as_user.username.encode('utf-8')
+        attrs['sudoRunAsUser'] = sudo_rule.run_as_user.username.encode('utf-8')
+        attrs['sudoRunAsGroup'] = sudo_rule.run_as_group.username.encode('utf-8')
+        attrs['sudoUser'] = [user.username.encode('utf-8') for user in sudo_rule.sudo_user.all()]
+        attrs['sudoCommand'] = [command.full_command.encode('utf-8') for command in sudo_rule.sudo_command.all()]
+        attrs['sudoHost'] = [host.hostname.encode('utf-8') for host in sudo_rule.sudo_host.all()]
+        return attrs
+
+    @classmethod
+    def _create_ldap_entry(cls, connection, base_dn, attrs, sudo_rule):
+        dn = f"cn={sudo_rule.name},{base_dn[0]}"
+        try:
+            connection.modify_s(dn, attrs)
+        except ldap.NO_SUCH_OBJECT:
+            attrs = cls._create_ldap_add_attrs(sudo_rule)
+            ldif = modlist.addModlist(attrs)
+            connection.add_s(dn, ldif)
+
+    @classmethod
+    def perform_create(cls, connection, base_dn, sudo_rule):
+        attrs = cls._create_ldap_mod_attrs(sudo_rule)
+        cls._create_ldap_entry(connection, base_dn, attrs, sudo_rule)
+        return sudo_rule
 
     def apply_filter(self, filter_str):
         return (filter_str in self.name or

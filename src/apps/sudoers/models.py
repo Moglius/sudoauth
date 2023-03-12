@@ -47,6 +47,14 @@ class SudoCommand(models.Model):
     args = models.CharField(max_length=255, blank=True)
     diggest = models.CharField(max_length=255, blank=True, null=True)
 
+    @property
+    def full_command(self):
+        full_command = ''
+        if self.diggest: full_command += f"{self.diggest} "
+        full_command += f"{self.command}"
+        if self.args: full_command += f" {self.args}"
+        return full_command
+
     def __str__(self):
         return f"{self.diggest} {self.command}" if self.diggest else self.command
 

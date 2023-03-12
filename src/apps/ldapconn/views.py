@@ -20,21 +20,6 @@ def create_sudo_rule_view(request):
     search_by_guid()
     return JsonResponse({"hola": "hello world!"})
 
-@transaction.atomic
-def get_notused_id(request):
-    ''' this method will be used to create users and groups with auto 
-        assignment id. Useful for users and groups creation.
-    '''
-
-    ldap_conf = LDAPConfig.objects.first()
-    min_id, max_id = ldap_conf.get_user_min(), ldap_conf.get_user_max()
-    pool = set(range(min_id, max_id + 1)) # large pools not accepted, limit the range <= 1Millon
-
-    used_ids = set(LnxUser.objects.values_list('uid_number', flat=True))
-
-    available_numbers = pool - used_ids  # Subtract used numbers from pool
-
-    return JsonResponse({"free_id": available_numbers.pop()})
 
 class LDAPViewSet(mixins.ListModelMixin,
     mixins.RetrieveModelMixin, mixins.CreateModelMixin,
@@ -64,7 +49,7 @@ class LDAPUserViewSet(LDAPViewSet):
         ldap_service = LDAPObjectsService(LDAPUser)
         serializer = LDAPUserGroupCreationSerializer(data=request.data)
         if serializer.is_valid():
-            user = ldap_service.create_object(serializer.data['objectGUIDHex'])
+            user = ldap_service.create_object_by_guid(serializer.data['objectGUIDHex'])
             serializer = LDAPUserSerializer(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -92,7 +77,7 @@ class LDAPGroupViewSet(LDAPViewSet):
         ldap_service = LDAPObjectsService(LDAPGroup)
         serializer = LDAPUserGroupCreationSerializer(data=request.data)
         if serializer.is_valid():
-            group = ldap_service.create_object(serializer.data['objectGUIDHex'])
+            group = ldap_service.create_object_by_guid(serializer.data['objectGUIDHex'])
             serializer = LDAPGroupSerializer(group)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -177,7 +177,7 @@ class LDAPObjectsService():
         for dn in base_dn:
             try:
                 result = self.connection.search_s(
-                    base=dn.dn, 
+                    base=dn.dn,
                     scope=dn.get_scope(),
                     filterstr=self.return_class.get_objectclass_filter(guid),
                     attrlist=['*'])
@@ -186,13 +186,11 @@ class LDAPObjectsService():
             if result:
                 break
 
-        if result:
-            return result
-        raise Http404
+        return result[0] if result else Http404
 
     def _perform_search_by_guid(self, search_dname, guid):
         result = self._ldap_search_by_guid(search_dname, guid)
-        return result[0]
+        return result
 
     def _get_page_control(self, server_controls):
         output = None
@@ -255,7 +253,7 @@ class LDAPObjectsService():
         dn, attrs = self._perform_search_by_guid(search_dname, guid)
         return self._create_return_object(dn, attrs)
 
-    def create_object(self, guid):
+    def create_object_by_guid(self, guid):
 
         search_dname = self._get_dn_to_search()
         dn, attrs = self._perform_search_by_guid(search_dname, guid)
@@ -263,3 +261,8 @@ class LDAPObjectsService():
         self.return_class.perform_create(self.ldap_config, self.connection,
             dn, entry_defaults, guid)
         return self._create_return_object(dn, attrs)
+
+    def create_object_by_intance(self, instance):
+        base_dn = self._get_dn_to_search()
+        self.return_class.perform_create(self.connection, base_dn, instance)
+        return instance
