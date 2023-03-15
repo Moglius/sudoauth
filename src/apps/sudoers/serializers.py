@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
+from apps.ldapconn.models import LDAPSudoRule
 from .models import (SudoRule, SudoUser,
     SudoHost, SudoCommand)
-from apps.ldapconn.models import LDAPSudoRule
 
 
 class SudoUserSerializer(serializers.ModelSerializer):

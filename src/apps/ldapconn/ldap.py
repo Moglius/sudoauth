@@ -1,117 +1,8 @@
-import binascii
 import ldap
-import ldap.modlist as modlist
 from django.http import Http404
 
 from apps.ldapconfig.models import LDAPConfig
 from .discovery import DNSService
-
-
-# Autofs:
-# https://ovalousek.wordpress.com/2015/08/03/autofs/
-
-
-LDAP_SERVER = 'ldap://192.168.0.44'
-BASE_DN = 'dc=localdomain,dc=com'  # base dn to search in
-LDAP_LOGIN = 'syncuser@localdomain.com'
-LDAP_PASSWORD = "Vyq59[Tc/?6k4bT2]%aE"
-
-def guid2hexstring(val):
-    s = ['\\%02X' % ord(x) for x in val]
-    return ''.join(s)
-
-
-def search_by_sid():
-
-    OBJECT_TO_SEARCH = "objectSid=S-1-5-21-3541430928-2051711210-1391384369-1108"
-    ATTRIBUTES_TO_SEARCH = ['*']
-
-    connect = ldap.initialize(LDAP_SERVER)
-    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
-    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
-    result = connect.search_s(BASE_DN, ldap.SCOPE_SUBTREE, OBJECT_TO_SEARCH, ATTRIBUTES_TO_SEARCH)
-
-    guid = result[0][1]['objectGUID'][0]
-
-    guid = binascii.hexlify(guid).decode('utf-8')
-    print(guid)
-
-    guid = ''.join(['\\%s' % guid[i:i+2] for i in range(0, len(guid), 2)])
-    print(guid)
-
-    OBJECT_TO_SEARCH = f"(objectGUID={guid})"
-    ATTRIBUTES_TO_SEARCH = ['*']
-
-    connect = ldap.initialize(LDAP_SERVER)
-    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
-    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
-    result2 = connect.search_s(BASE_DN, ldap.SCOPE_SUBTREE, OBJECT_TO_SEARCH, ATTRIBUTES_TO_SEARCH)
-    print('-------------------')
-    print(result2[0])
-    print('-------------------')
-
-def search_by_guid():
-
-    OBJECT_TO_SEARCH = "(objectGUID=1556461e48de4821a4ba62b0df60363a)"
-    ATTRIBUTES_TO_SEARCH = ['*']
-
-    connect = ldap.initialize(LDAP_SERVER)
-    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
-    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
-    result = connect.search_s(BASE_DN, ldap.SCOPE_SUBTREE, OBJECT_TO_SEARCH, ATTRIBUTES_TO_SEARCH)
-
-    print(result[0])
-
-
-def modify_user():
-
-    OBJECT_TO_SEARCH = 'userPrincipalName=syncuser@localdomain.com'
-    ATTRIBUTES_TO_SEARCH = ['gidNumber']
-
-    connect = ldap.initialize(LDAP_SERVER)
-    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
-    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
-    result = connect.search_s(BASE_DN, ldap.SCOPE_SUBTREE, OBJECT_TO_SEARCH, ATTRIBUTES_TO_SEARCH)
-
-    print(result[0])
-    gidnumber = str(int(result[0][1]['gidNumber'][0].decode('utf-8')) + 1)
-
-    dn = result[0][0]
-
-    mod_attrs = [( ldap.MOD_REPLACE, "gidNumber", gidnumber.encode('utf-8')),
-                 ( ldap.MOD_REPLACE, "uidNumber", gidnumber.encode('utf-8')),
-                 ( ldap.MOD_REPLACE, "gecos", b'syncuser'),
-                 ( ldap.MOD_REPLACE, "homeDirectory", b'/home/syncuser'),
-                 ( ldap.MOD_REPLACE, "loginShell", b'/usr/bin/bash')]
-
-    connect.modify_s(dn, mod_attrs)
-
-def create_sudo_rule():
-
-    dn = "cn=RITM23123124,ou=sudo,dc=localdomain,dc=com"
-
-    attrs = {}
-    attrs['cn'] = b'RITM23123124'
-    attrs['objectclass'] = [
-        b'top',
-        b'sudoRole',
-    ]
-    attrs['sudoOption'] = b'!authenticate'
-    attrs['sudoRunAs'] = b'root'
-    attrs['sudoRunAsGroup'] = b'root'
-    attrs['sudoRunAsUser'] = b'root'
-
-    attrs['sudoUser'] = [b'syncuser', b'%syncgroup']
-    attrs['sudoCommand'] = [b'/bin/dmidecode -q 1', b'/bin/tail -f /var/log/secure']
-    attrs['sudoHost'] = [b'host1.localdomain.com', b'host2.localdomain.com']
-
-    connect = ldap.initialize(LDAP_SERVER)
-    connect.set_option(ldap.OPT_REFERRALS, 0)  # to search the object and all its descendants
-    connect.simple_bind_s(LDAP_LOGIN, LDAP_PASSWORD)
-
-    ldif = modlist.addModlist(attrs)
-    connect.add_s(dn, ldif)
-    connect.unbind_s()
 
 
 class LDAPObjectsService():
@@ -266,3 +157,7 @@ class LDAPObjectsService():
         base_dn = self._get_dn_to_search()
         self.return_class.perform_create(self.connection, base_dn, instance)
         return instance
+
+    def destroy_by_instance(self, instance):
+        ldap_entry = self.get_object(instance.guidhex)
+        self.connection.delete_s(ldap_entry.distinguishedName)

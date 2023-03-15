@@ -1,21 +1,10 @@
-from django.http import JsonResponse
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 
 from .serializers import (LDAPUserSerializer, LDAPUserGroupCreationSerializer,
     LDAPGroupSerializer, LDAPSudoRuleSerializer)
-from .ldap import LDAPObjectsService, create_sudo_rule, modify_user, search_by_sid, search_by_guid
+from .ldap import LDAPObjectsService
 from .models import LDAPUser, LDAPGroup, LDAPSudoRule
-
-
-def create_sudo_rule_view(request):
-    ''' Test code for sudorule creation and user/groups updates
-    '''
-    create_sudo_rule()
-    modify_user()
-    search_by_sid()
-    search_by_guid()
-    return JsonResponse({"hola": "hello world!"})
 
 
 class LDAPViewSet(mixins.ListModelMixin,

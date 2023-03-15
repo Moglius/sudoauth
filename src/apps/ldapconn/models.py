@@ -1,5 +1,8 @@
-import struct, uuid, binascii, ldap
-import ldap.modlist as modlist
+import struct
+import uuid
+import binascii
+import ldap
+from ldap import modlist
 
 from django.db import transaction
 from apps.lnxusers.models import LnxUser, LnxGroup, LnxShell
@@ -223,19 +226,19 @@ class LDAPGroup:
 class LDAPSudoRule:
 
     def __init__(self, dn, attrs):
-        helper = LDAPHelper()
+        self.helper = LDAPHelper()
         self.distinguishedName = dn
-        self.name = helper.get_attributes(attrs, 'name')
-        self.cn = helper.get_attributes(attrs, 'cn')
-        self.description = helper.get_attributes(attrs, 'description')
-        self.sudoCommand = helper.get_attributes(attrs, 'sudoCommand')
-        self.sudoHost = helper.get_attributes(attrs, 'sudoHost')
-        self.sudoOption = helper.get_attributes(attrs, 'sudoOption')
-        self.sudoRunAsUser = helper.get_attributes(attrs, 'sudoRunAsUser')
-        self.sudoRunAsGroup = helper.get_attributes(attrs, 'sudoRunAsGroup')
-        self.sudoUser = helper.get_attributes(attrs, 'sudoUser')
-        self.objectGUID = helper.get_guid(attrs, 'objectGUID')
-        self.objectGUIDHex = helper.get_guid_hex(attrs, 'objectGUID')
+        self.name = self.helper.get_attributes(attrs, 'name')
+        self.cn = self.helper.get_attributes(attrs, 'cn')
+        self.description = self.helper.get_attributes(attrs, 'description')
+        self.sudoCommand = self.helper.get_attributes(attrs, 'sudoCommand')
+        self.sudoHost = self.helper.get_attributes(attrs, 'sudoHost')
+        self.sudoOption = self.helper.get_attributes(attrs, 'sudoOption')
+        self.sudoRunAsUser = self.helper.get_attributes(attrs, 'sudoRunAsUser')
+        self.sudoRunAsGroup = self.helper.get_attributes(attrs, 'sudoRunAsGroup')
+        self.sudoUser = self.helper.get_attributes(attrs, 'sudoUser')
+        self.objectGUID = self.helper.get_guid(attrs, 'objectGUID')
+        self.objectGUIDHex = self.helper.get_guid_hex(attrs, 'objectGUID')
 
 
     @classmethod
@@ -283,6 +286,15 @@ class LDAPSudoRule:
         return attrs
 
     @classmethod
+    def _save_guid_on_entry(cls, dn, connection, sudo_rule):
+        new_attrs = connection.search_s(base=dn, scope=ldap.SCOPE_BASE,
+            filterstr=cls.get_objectclass_filter(), attrlist=['*'])[0][1]
+        helper = LDAPHelper()
+        guidhex = helper.get_guid_hex(new_attrs, 'objectGUID')
+        sudo_rule.guidhex = guidhex
+        sudo_rule.save()
+
+    @classmethod
     def _create_ldap_entry(cls, connection, base_dn, attrs, sudo_rule):
         dn = f"cn={sudo_rule.name},{base_dn[0]}"
         try:
@@ -291,6 +303,7 @@ class LDAPSudoRule:
             attrs = cls._create_ldap_add_attrs(sudo_rule)
             ldif = modlist.addModlist(attrs)
             connection.add_s(dn, ldif)
+        cls._save_guid_on_entry(dn, connection, sudo_rule)
 
     @classmethod
     def perform_create(cls, connection, base_dn, sudo_rule):

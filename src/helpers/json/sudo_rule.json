@@ -1,0 +1,26 @@
+{
+  "name": "RITM1233",
+  "sudo_user": [
+    {
+      "username": "syncuser"
+    }
+  ],
+  "sudo_host": [
+    {
+      "hostname": "server1.localdomain.com"
+    }
+  ],
+  "sudo_command": [
+    {
+      "command": "/bin/dmidecode",
+      "args": "-q 1",
+      "diggest": null
+    }
+  ],
+  "run_as_user": {
+    "username": "root"
+  },
+  "run_as_group": {
+    "username": "root"
+  }
+}

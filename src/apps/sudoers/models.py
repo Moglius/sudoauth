@@ -81,6 +81,7 @@ class SudoRule(models.Model):
         related_name='sudorule_runasgroup_set',
         on_delete=models.CASCADE
     )
+    guidhex = models.CharField(max_length=60)
 
     def __str__(self):
         return self.name
