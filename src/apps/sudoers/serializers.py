@@ -26,7 +26,7 @@ class SudoHostSerializer(serializers.ModelSerializer):
 class SudoCommandSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoCommand
-        fields = ['pk', 'command', 'args', 'diggest']
+        fields = ['pk', 'command', 'args', 'diggest', 'full_command']
         extra_kwargs = {
             'command': {'validators': []},
         }
@@ -56,36 +56,39 @@ class SudoRuleSerializer(serializers.ModelSerializer):
 
     def _update_sudo_rule(self, sudo_rule, validated_data):
         if 'run_as_user' in validated_data:
-            sudo_rule.run_as_user = SudoUser.get_instance(validated_data.pop('run_as_user'))
+            sudo_rule.run_as_user = SudoUser.get_instance(
+                validated_data.pop('run_as_user'))
         if 'run_as_group' in validated_data:
-            sudo_rule.run_as_group = SudoUser.get_instance(validated_data.pop('run_as_group'))
+            sudo_rule.run_as_group = SudoUser.get_instance(
+                validated_data.pop('run_as_group'))
         return sudo_rule
 
-    def _add_fields_m2m(self, sudo_rule, validated_data):
-        if 'sudo_user' in validated_data:
-            sudo_users = SudoUser.get_instances(validated_data.pop('sudo_user'))
-            sudo_rule.sudo_user.clear()
-            sudo_rule.sudo_user.add(*sudo_users)
-        if 'sudo_host' in validated_data:
-            sudo_hosts = SudoHost.get_instances(validated_data.pop('sudo_host'))
-            sudo_rule.sudo_host.clear()
-            sudo_rule.sudo_host.add(*sudo_hosts)
-        if 'sudo_command' in validated_data:
-            sudo_commands = SudoCommand.get_instances(validated_data.pop('sudo_command'))
-            sudo_rule.sudo_command.clear()
-            sudo_rule.sudo_command.add(*sudo_commands)
+    def _assign_m2m_fields(self, key, validated_data, cur_class, sudo_rule_m2m):
+        if key in validated_data:
+            items = cur_class.get_instances(
+                validated_data.pop(key))
+            sudo_rule_m2m.clear()
+            sudo_rule_m2m.add(*items)
+
+    def _add_m2m_fields(self, sudo_rule, validated_data):
+        self._assign_m2m_fields('sudo_user', validated_data,
+                                SudoUser, sudo_rule.sudo_user)
+        self._assign_m2m_fields('sudo_host', validated_data,
+                                SudoHost, sudo_rule.sudo_host)
+        self._assign_m2m_fields('sudo_command', validated_data,
+                                SudoCommand, sudo_rule.sudo_command)
         return sudo_rule
 
     def create(self, validated_data): # POST
         sudo_rule = self._create_sudo_rule(validated_data)
-        sudo_rule = self._add_fields_m2m(sudo_rule, validated_data)
+        sudo_rule = self._add_m2m_fields(sudo_rule, validated_data)
         sudo_rule.save()
         LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
         return sudo_rule
 
     def update(self, instance, validated_data): # PATCH (partial), PUT
         sudo_rule = self._update_sudo_rule(instance, validated_data)
-        sudo_rule = self._add_fields_m2m(sudo_rule, validated_data)
+        sudo_rule = self._add_m2m_fields(sudo_rule, validated_data)
         sudo_rule.save()
         LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
         return sudo_rule
