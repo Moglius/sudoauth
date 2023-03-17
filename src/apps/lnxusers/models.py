@@ -24,6 +24,7 @@ class LnxGroup(models.Model):
     groupname = models.CharField(max_length=65,
         validators=[validate_username])
     gid_number = models.BigIntegerField(unique=True)
+    guidhex = models.CharField(max_length=60)
 
     related_group = models.ForeignKey(
         'sudoers.SudoUser',
@@ -69,6 +70,7 @@ class LnxUser(models.Model):
         'sudoers.SudoUser',
         on_delete=models.CASCADE
     )
+    guidhex = models.CharField(max_length=60)
 
     def __str__(self):
         return self.username

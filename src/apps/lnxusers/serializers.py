@@ -25,13 +25,3 @@ class LnxUserSerializer(serializers.ModelSerializer):
         model = LnxUser
         fields = ['pk', 'username', 'uid_number', 'primary_group',
             'login_shell', 'home_dir', 'gecos']
-
-    def create(self, validated_data): # POST
-        sudo_users = validated_data.pop('sudo_user')
-        print(sudo_users)
-        return ''
-
-    def update(self, instance, validated_data): # PATCH, PUT
-        print(validated_data)
-        print(instance)
-        return ''

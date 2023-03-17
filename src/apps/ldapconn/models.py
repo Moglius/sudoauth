@@ -134,7 +134,8 @@ class LDAPUser:
             primary_group=primary_group,
             login_shell=shell,
             home_dir=entry_defaults['homeDirectory'].decode('utf-8'),
-            gecos=entry_defaults['gecos'].decode('utf-8')
+            gecos=entry_defaults['gecos'].decode('utf-8'),
+            guidhex=guid
         )
 
     @classmethod
@@ -208,7 +209,8 @@ class LDAPGroup:
     def _create_db_entry(cls, entry_defaults, guid, free_gid):
         LnxGroup.objects.create(
             groupname=entry_defaults['sAMAccountName'].decode('utf-8'),
-            gid_number=int(free_gid)
+            gid_number=int(free_gid),
+            guidhex=guid
         )
 
     @classmethod
