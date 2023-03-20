@@ -158,6 +158,10 @@ class LDAPObjectsService():
         self.return_class.perform_create(self.connection, base_dn, instance)
         return instance
 
+    def clear_by_instance(self, instance):
+        ldap_entry = self.get_object(instance.guidhex)
+        self.return_class.perform_clear(self.connection, ldap_entry)
+
     def destroy_by_instance(self, instance):
         ldap_entry = self.get_object(instance.guidhex)
         self.connection.delete_s(ldap_entry.distinguishedName)

@@ -145,6 +145,18 @@ class LDAPUser:
         cls._create_db_entry(entry_defaults, guid, free_uid)
         cls._modify_ldap_entry(ldap_conn, entry_defaults, free_uid, dn)
 
+    @classmethod
+    def perform_clear(cls, ldap_conn, ldap_entry):
+        mod_attrs = [
+            ( ldap.MOD_DELETE, "gidNumber", None),
+            ( ldap.MOD_DELETE, "uidNumber", None),
+            ( ldap.MOD_DELETE, "gecos", None),
+            ( ldap.MOD_DELETE, "homeDirectory", None),
+            ( ldap.MOD_DELETE, "loginShell", None)
+        ]
+
+        ldap_conn.modify_s(ldap_entry.distinguishedName, mod_attrs)
+
     def apply_filter(self, filter_str):
         return (filter_str in self.distinguishedName or
             filter_str in self.userPrincipalName)
@@ -212,6 +224,14 @@ class LDAPGroup:
             gid_number=int(free_gid),
             guidhex=guid
         )
+    
+    @classmethod
+    def perform_clear(cls, ldap_conn, ldap_entry):
+        mod_attrs = [
+            ( ldap.MOD_DELETE, "gidNumber", None),
+        ]
+
+        ldap_conn.modify_s(ldap_entry.distinguishedName, mod_attrs)
 
     @classmethod
     @transaction.atomic
