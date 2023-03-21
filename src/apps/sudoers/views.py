@@ -1,5 +1,4 @@
 from rest_framework import viewsets
-from django.shortcuts import get_object_or_404
 
 from apps.ldapconn.models import LDAPSudoRule
 from apps.ldapconn.ldap import LDAPObjectsService
