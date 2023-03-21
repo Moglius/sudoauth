@@ -32,7 +32,7 @@ class SudoCommandSerializer(serializers.ModelSerializer):
         }
 
 
-class SudoRuleSerializer(serializers.ModelSerializer):
+class SudoRuleListDetailSerializer(serializers.ModelSerializer):
     sudo_user = SudoUserSerializer(many=True)
     sudo_host = SudoHostSerializer(many=True)
     sudo_command = SudoCommandSerializer(many=True)
@@ -44,51 +44,21 @@ class SudoRuleSerializer(serializers.ModelSerializer):
         fields = ['pk', 'name', 'sudo_user', 'sudo_host',
             'sudo_command', 'run_as_user', 'run_as_group']
 
-    def _create_sudo_rule(self, validated_data):
-        run_as_user = SudoUser.get_instance(validated_data.pop('run_as_user'))
-        run_as_group = SudoUser.get_instance(validated_data.pop('run_as_group'))
-        name = validated_data.pop('name')
-        return SudoRule.objects.create(
-            name=name,
-            run_as_group=run_as_group,
-            run_as_user=run_as_user
-        )
 
-    def _update_sudo_rule(self, sudo_rule, validated_data):
-        if 'run_as_user' in validated_data:
-            sudo_rule.run_as_user = SudoUser.get_instance(
-                validated_data.pop('run_as_user'))
-        if 'run_as_group' in validated_data:
-            sudo_rule.run_as_group = SudoUser.get_instance(
-                validated_data.pop('run_as_group'))
-        return sudo_rule
+class SudoRulePutPatchSerializer(serializers.ModelSerializer):
 
-    def _assign_m2m_fields(self, key, validated_data, cur_class, sudo_rule_m2m):
-        if key in validated_data:
-            items = cur_class.get_instances(
-                validated_data.pop(key))
-            sudo_rule_m2m.clear()
-            sudo_rule_m2m.add(*items)
+    class Meta:
+        model = SudoRule
+        fields = ['pk', 'name', 'sudo_user', 'sudo_host',
+            'sudo_command', 'run_as_user', 'run_as_group']
+        extra_kwargs = {
+            'name': {'read_only': True},
+        }
 
-    def _add_m2m_fields(self, sudo_rule, validated_data):
-        self._assign_m2m_fields('sudo_user', validated_data,
-                                SudoUser, sudo_rule.sudo_user)
-        self._assign_m2m_fields('sudo_host', validated_data,
-                                SudoHost, sudo_rule.sudo_host)
-        self._assign_m2m_fields('sudo_command', validated_data,
-                                SudoCommand, sudo_rule.sudo_command)
-        return sudo_rule
 
-    def create(self, validated_data): # POST
-        sudo_rule = self._create_sudo_rule(validated_data)
-        sudo_rule = self._add_m2m_fields(sudo_rule, validated_data)
-        sudo_rule.save()
-        LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
-        return sudo_rule
+class SudoRuleCreateSerializer(serializers.ModelSerializer):
 
-    def update(self, instance, validated_data): # PATCH (partial), PUT
-        sudo_rule = self._update_sudo_rule(instance, validated_data)
-        sudo_rule = self._add_m2m_fields(sudo_rule, validated_data)
-        sudo_rule.save()
-        LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
-        return sudo_rule
+    class Meta:
+        model = SudoRule
+        fields = ['pk', 'name', 'sudo_user', 'sudo_host',
+            'sudo_command', 'run_as_user', 'run_as_group']

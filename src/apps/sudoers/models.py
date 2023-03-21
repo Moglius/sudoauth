@@ -56,7 +56,7 @@ class SudoCommand(models.Model):
         return full_command
 
     def __str__(self):
-        return f"{self.diggest} {self.command}" if self.diggest else self.command
+        return self.full_command
 
     @classmethod
     def get_instances(cls, sudo_commands) -> list:
