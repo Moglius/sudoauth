@@ -156,6 +156,30 @@ class LDAPUser:
         ]
 
         ldap_conn.modify_s(ldap_entry.distinguishedName, mod_attrs)
+    
+    @classmethod
+    def perform_update(cls, ldap_conn, dn, instance):
+        mod_attrs = [
+            ( ldap.MOD_REPLACE, "gidNumber", instance.get_ldap_gid()),
+            ( ldap.MOD_REPLACE, "uidNumber", instance.get_ldap_uid()),
+            ( ldap.MOD_REPLACE, "gecos", instance.get_ldap_gecos()),
+            ( ldap.MOD_REPLACE, "homeDirectory", instance.get_ldap_homedir()),
+            ( ldap.MOD_REPLACE, "loginShell", instance.get_ldap_shell())
+        ]
+
+        ldap_conn.modify_s(dn, mod_attrs)
+
+    @classmethod
+    def clear_lnxuser(cls, lnxuser):
+        ldap_service = LDAPObjectsService(LDAPUser)
+        ldap_service.clear_by_instance(lnxuser)
+        return lnxuser
+
+    @classmethod
+    def update_lnxuser(cls, lnxuser):
+        ldap_service = LDAPObjectsService(LDAPUser)
+        ldap_service.update_by_instance(lnxuser)
+        return lnxuser
 
     def apply_filter(self, filter_str):
         return (filter_str in self.distinguishedName or
@@ -239,6 +263,26 @@ class LDAPGroup:
         free_gid = cls._get_free_id(ldap_config)
         cls._create_db_entry(entry_defaults, guid, free_gid)
         cls._modify_ldap_entry(ldap_conn, free_gid, dn)
+
+    @classmethod
+    def perform_update(cls, ldap_conn, dn, instance):
+        mod_attrs = [
+            ( ldap.MOD_REPLACE, "gidNumber", instance.get_ldap_gid())
+        ]
+
+        ldap_conn.modify_s(dn, mod_attrs)
+
+    @classmethod
+    def clear_lnxgroup(cls, lnxgroup):
+        ldap_service = LDAPObjectsService(LDAPGroup)
+        ldap_service.clear_by_instance(lnxgroup)
+        return lnxgroup
+
+    @classmethod
+    def update_lnxgroup(cls, lnxgroup):
+        ldap_service = LDAPObjectsService(LDAPGroup)
+        ldap_service.update_by_instance(lnxgroup)
+        return lnxgroup
 
     def apply_filter(self, filter_str):
         filter_str = filter_str.lower()

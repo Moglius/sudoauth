@@ -81,15 +81,20 @@ class LDAPConfig(models.Model):
     default_group = models.ForeignKey(
         LnxGroup,
         default=1,
-        related_name='defaul_group_set',
+        related_name='default_group_set',
         on_delete=models.CASCADE
     )
     default_shell = models.ForeignKey(
         LnxShell,
         default=1,
-        related_name='defaul_shell_set',
+        related_name='default_shell_set',
         on_delete=models.CASCADE
     )
+
+    @classmethod
+    def get_default_group(cls):
+        ldap_config = LDAPConfig.objects.first()
+        return ldap_config.default_group
 
     def __str__(self):
         return self.domain_name

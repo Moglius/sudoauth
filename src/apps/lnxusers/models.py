@@ -48,6 +48,12 @@ class LnxGroup(models.Model):
 
     def get_gid_number(self):
         return str(self.gid_number)
+    
+    def get_guid(self):
+        return self.guidhex
+    
+    def get_ldap_gid(self):
+        return str(self.gid_number).encode('utf-8')
 
 
 class LnxUser(models.Model):
@@ -56,11 +62,11 @@ class LnxUser(models.Model):
     uid_number = models.BigIntegerField(unique=True)
     primary_group = models.ForeignKey(
         LnxGroup,
-        on_delete=models.CASCADE
+        on_delete=models.DO_NOTHING
     )
     login_shell = models.ForeignKey(
         LnxShell,
-        on_delete=models.CASCADE
+        on_delete=models.DO_NOTHING
     )
     home_dir = models.CharField(max_length=100,
         validators=[validate_path])
@@ -78,6 +84,9 @@ class LnxUser(models.Model):
     def get_sudo_user_name(self):
         return self.username
 
+    def get_guid(self):
+        return self.guidhex
+
     def set_sudo_user(self):
         sudo_user = apps.get_model('sudoers.SudoUser')
         self.related_user = sudo_user.objects.create(
@@ -90,3 +99,18 @@ class LnxUser(models.Model):
     def save(self, *args, **kwargs):
         self.home_dir = path.normpath(self.home_dir)
         super(LnxUser, self).save(*args, **kwargs)
+
+    def get_ldap_gid(self):
+        return str(self.primary_group.gid_number).encode('utf-8')
+
+    def get_ldap_uid(self):
+        return str(self.uid_number).encode('utf-8')
+
+    def get_ldap_gecos(self):
+        return self.gecos.encode('utf-8')
+
+    def get_ldap_homedir(self):
+        return self.home_dir.encode('utf-8')
+
+    def get_ldap_shell(self):
+        return self.login_shell.shell.encode('utf-8')

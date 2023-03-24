@@ -38,4 +38,5 @@ class LnxUserPutPatchSerializer(serializers.ModelSerializer):
             'login_shell', 'home_dir', 'gecos']
         extra_kwargs = {
             'username': {'read_only': True},
+            'gecos': {'read_only': True},
         }
