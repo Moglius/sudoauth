@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from apps.ldapconn.models import LDAPSudoRule
 from .models import (SudoRule, SudoUser,
     SudoHost, SudoCommand)
 
@@ -9,27 +8,18 @@ class SudoUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoUser
         fields = ['pk', 'username']
-        extra_kwargs = {
-            'username': {'validators': []},
-        }
 
 
 class SudoHostSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoHost
         fields = ['pk', 'hostname']
-        extra_kwargs = {
-            'hostname': {'validators': []},
-        }
 
 
 class SudoCommandSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoCommand
         fields = ['pk', 'command', 'args', 'diggest', 'full_command']
-        extra_kwargs = {
-            'command': {'validators': []},
-        }
 
 
 class SudoRuleListDetailSerializer(serializers.ModelSerializer):

@@ -2,9 +2,39 @@ from rest_framework import viewsets
 
 from apps.ldapconn.models import LDAPSudoRule
 from apps.ldapconn.ldap import LDAPObjectsService
-from .models import SudoRule
+from .models import SudoRule, SudoCommand
 from .serializers import (SudoRuleListDetailSerializer,
-    SudoRulePutPatchSerializer, SudoRuleCreateSerializer)
+    SudoRulePutPatchSerializer, SudoRuleCreateSerializer,
+    SudoCommandSerializer)
+
+
+class SudoCommandViewSet(viewsets.ModelViewSet):
+    queryset = SudoCommand.objects.all()
+    serializer_class = SudoCommandSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        sudo_commmand = self.get_object()
+        sudo_rules = list(sudo_commmand.sudorule_set.all())
+        response = super().destroy(request, *args, **kwargs)
+        for sudo_rule in sudo_rules:
+            LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        return response
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        sudo_commmand = self.get_object()
+        sudo_rules = sudo_commmand.sudorule_set.all()
+        for sudo_rule in sudo_rules:
+            LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        return response
+
+    def partial_update(self, request, *args, **kwargs):
+        response = super().partial_update(request, *args, **kwargs)
+        sudo_commmand = self.get_object()
+        sudo_rules = sudo_commmand.sudorule_set.all()
+        for sudo_rule in sudo_rules:
+            LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        return response
 
 
 class SudoRuleViewSet(viewsets.ModelViewSet):
