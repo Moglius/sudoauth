@@ -5,8 +5,8 @@ from .views import (LnxShellViewSet, LnxGroupViewSet,
 
 
 router = DefaultRouter()
-router.register('lnxshells', LnxShellViewSet, basename="lnxshell")
-router.register('lnxgroups', LnxGroupViewSet, basename="lnxgroup")
-router.register('lnxusers', LnxUserViewSet, basename="lnxuser")
+router.register('shells', LnxShellViewSet, basename="shells")
+router.register('groups', LnxGroupViewSet, basename="groups")
+router.register('users', LnxUserViewSet, basename="users")
 
 urlpatterns = router.urls
