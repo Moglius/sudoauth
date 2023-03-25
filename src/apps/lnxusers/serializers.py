@@ -6,7 +6,10 @@ from .models import LnxGroup, LnxShell, LnxUser
 class LnxShellSerializer(serializers.ModelSerializer):
     class Meta:
         model = LnxShell
-        fields = ['pk', 'shell']
+        fields = ['pk', 'shell', 'built_in']
+        extra_kwargs = {
+            'built_in': {'read_only': True},
+        }
 
 
 class LnxGroupSerializer(serializers.ModelSerializer):

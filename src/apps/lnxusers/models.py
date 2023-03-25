@@ -20,6 +20,15 @@ class LnxShell(models.Model):
     def get_shell_name(self):
         return self.shell
 
+    def is_built_in(self):
+        return self.built_in
+
+    def is_default_shell(self):
+        return self.default_shell_set.all()
+
+    def get_attached_lnxusers(self):
+        return self.lnxuser_set.all()
+
 
 class LnxGroup(models.Model):
     groupname = models.CharField(max_length=65,
@@ -49,12 +58,18 @@ class LnxGroup(models.Model):
 
     def get_gid_number(self):
         return str(self.gid_number)
-    
+
     def get_guid(self):
         return self.guidhex
-    
+
     def get_ldap_gid(self):
         return str(self.gid_number).encode('utf-8')
+
+    def is_default_group(self):
+        return self.default_group_set.all()
+
+    def get_attached_lnxusers(self):
+        return self.lnxuser_set.all()
 
 
 class LnxUser(models.Model):
@@ -96,6 +111,14 @@ class LnxUser(models.Model):
     def set_sudo_user_name(self):
         self.related_user.username = self.get_sudo_user_name()
         self.related_user.save()
+
+    def set_shell(self, shell):
+        self.login_shell = shell
+        self.save()
+
+    def set_group(self, group):
+        self.primary_group = group
+        self.save()
 
     def save(self, *args, **kwargs):
         self.home_dir = path.normpath(self.home_dir)

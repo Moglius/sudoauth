@@ -96,6 +96,11 @@ class LDAPConfig(models.Model):
         ldap_config = LDAPConfig.objects.first()
         return ldap_config.default_group
 
+    @classmethod
+    def get_default_shell(cls):
+        ldap_config = LDAPConfig.objects.first()
+        return ldap_config.default_shell
+
     def __str__(self):
         return self.domain_name
 

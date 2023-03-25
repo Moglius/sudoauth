@@ -24,6 +24,9 @@ class SudoUser(models.Model):
             return_list.append(cls.objects.get(username=sudo_user['username']))
         return return_list
 
+    def get_attached_sudorules(self):
+        return list(self.sudorule_set.all())
+
 
 class SudoHost(models.Model):
 
