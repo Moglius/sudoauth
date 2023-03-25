@@ -13,10 +13,6 @@ class LDAPUserSerializer(serializers.Serializer):
     objectGUIDHex = serializers.CharField(max_length=255)
 
 
-class LDAPUserCreateSerializer(serializers.Serializer):
-    objectGUIDHex = serializers.CharField(max_length=255)
-
-
 class LDAPGroupSerializer(serializers.Serializer):
     distinguishedName = serializers.CharField(max_length=255)
     sAMAccountName = serializers.CharField(max_length=255)
