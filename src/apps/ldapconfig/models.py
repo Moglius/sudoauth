@@ -116,7 +116,7 @@ class LDAPConfig(models.Model):
 
     def get_user_max(self):
         return self.users_pool.pool_max
-    
+
     def get_group_min(self):
         return self.groups_pool.pool_min
 

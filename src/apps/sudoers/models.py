@@ -8,6 +8,7 @@ class SudoUser(models.Model):
     ''' https://www.sudo.ws/docs/man/1.8.17/sudoers.ldap.man/#sudoUser
     '''
     username = models.CharField(max_length=65, unique=True)
+    built_in = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

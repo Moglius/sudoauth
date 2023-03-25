@@ -158,7 +158,6 @@ class LDAPObjectsService():
         dn, attrs = self._perform_search_by_guid(search_dname, instance.get_guid())
         self.return_class.perform_update(self.connection, dn, instance)
 
-
     def create_object_by_intance(self, instance):
         base_dn = self._get_dn_to_search()
         self.return_class.perform_create(self.connection, base_dn, instance)

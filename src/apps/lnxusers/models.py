@@ -8,6 +8,7 @@ from helpers.validators.model_validators import (validate_path,
 class LnxShell(models.Model):
     shell = models.CharField(max_length=100, unique=True,
         validators=[validate_path])
+    built_in = models.BooleanField(default=False)
 
     def __str__(self):
         return self.shell
