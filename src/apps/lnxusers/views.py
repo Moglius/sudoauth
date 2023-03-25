@@ -14,24 +14,24 @@ class LnxShellViewSet(viewsets.ModelViewSet):
     queryset = LnxShell.objects.all()
     serializer_class = LnxShellSerializer
 
-    def _set_lnxuser_default_shell(self, instance):
+    def _set_lnxuser_default_shell(self, shell: LnxShell):
         default_shell = LDAPConfig.get_default_shell()
-        for lnxuser in instance.get_attached_lnxusers():
+        for lnxuser in shell.get_attached_lnxusers():
             lnxuser.set_shell(default_shell)
             LDAPUser.update_lnxuser(lnxuser)
         return default_shell
 
-    def _update_shell_ldap_entries(self, shell):
+    def _update_shell_ldap_entries(self, shell: LnxShell):
         for lnxuser in shell.get_attached_lnxusers():
             LDAPUser.update_lnxuser(lnxuser)
         return shell
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.is_built_in() or instance.is_default_shell():
+        shell = self.get_object()
+        if shell.is_built_in() or shell.is_default_shell():
             raise ValidationError('This shell is either seleted as default in your config '\
                                   'or it is an app built-in shell, Can not be deleted.')
-        self._set_lnxuser_default_shell(instance)
+        self._set_lnxuser_default_shell(shell)
         return super().destroy(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
