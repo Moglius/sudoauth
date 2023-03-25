@@ -344,6 +344,9 @@ class LDAPSudoRule:
         self.sudoRunAsUser = self.helper.get_attributes(attrs, 'sudoRunAsUser')
         self.sudoRunAsGroup = self.helper.get_attributes(attrs, 'sudoRunAsGroup')
         self.sudoUser = self.helper.get_attributes(attrs, 'sudoUser')
+        self.sudoNotAfter = self.helper.get_attributes(attrs, 'sudoNotAfter')
+        self.sudoNotBefore = self.helper.get_attributes(attrs, 'sudoNotBefore')
+        self.sudoOrder = self.helper.get_attributes(attrs, 'sudoOrder')
         self.objectGUID = self.helper.get_guid(attrs, 'objectGUID')
         self.objectGUIDHex = self.helper.get_guid_hex(attrs, 'objectGUID')
 

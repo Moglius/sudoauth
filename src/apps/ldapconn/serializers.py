@@ -48,6 +48,9 @@ class LDAPSudoRuleSerializer(serializers.Serializer):
     sudoUser = serializers.ListField(
         child=serializers.CharField(max_length=255)
     )
+    sudoNotBefore = serializers.CharField(max_length=255)
+    sudoNotAfter = serializers.CharField(max_length=255)
+    sudoOrder = serializers.CharField(max_length=255)
     objectGUID = serializers.CharField(max_length=255)
     objectGUIDHex = serializers.CharField(max_length=255)
 
