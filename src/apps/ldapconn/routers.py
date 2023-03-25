@@ -3,8 +3,8 @@ from .views import LDAPUserViewSet, LDAPGroupViewSet, LDAPSudoRuleViewSet
 
 
 router = DefaultRouter()
-router.register('ldapusers', LDAPUserViewSet, basename="ldapuser")
+router.register('ldapusers', LDAPUserViewSet, basename="ldapusers")
 router.register('ldapgroups', LDAPGroupViewSet, basename="ldapgroups")
-router.register('ldapsudorules', LDAPSudoRuleViewSet, basename="ldapsudorules")
+router.register('rules', LDAPSudoRuleViewSet, basename="rules")
 
 urlpatterns = router.urls

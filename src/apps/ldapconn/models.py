@@ -181,6 +181,21 @@ class LDAPUser:
         ldap_service.update_by_instance(lnxuser)
         return lnxuser
 
+    @classmethod
+    def get_object_by_guid(cls, guid):
+        ldap_service = LDAPObjectsService(LDAPUser)
+        return ldap_service.get_object(guid)
+
+    @classmethod
+    def create_object_by_guid(cls, guid):
+        ldap_service = LDAPObjectsService(LDAPUser)
+        return ldap_service.create_object_by_guid(guid)
+    
+    @classmethod
+    def get_objects_list(cls):
+        ldap_service = LDAPObjectsService(LDAPUser)
+        return list(ldap_service.get_objects())
+
     def apply_filter(self, filter_str):
         return (filter_str in self.distinguishedName or
             filter_str in self.userPrincipalName)
@@ -284,6 +299,21 @@ class LDAPGroup:
         ldap_service.update_by_instance(lnxgroup)
         return lnxgroup
 
+    @classmethod
+    def get_object_by_guid(cls, guid):
+        ldap_service = LDAPObjectsService(LDAPGroup)
+        return ldap_service.get_object(guid)
+
+    @classmethod
+    def create_object_by_guid(cls, guid):
+        ldap_service = LDAPObjectsService(LDAPGroup)
+        return ldap_service.create_object_by_guid(guid)
+
+    @classmethod
+    def get_objects_list(cls):
+        ldap_service = LDAPObjectsService(LDAPGroup)
+        return list(ldap_service.get_objects())
+
     def apply_filter(self, filter_str):
         filter_str = filter_str.lower()
         return any(filter_str in word for word in self.get_list_to_compare())
@@ -376,6 +406,16 @@ class LDAPSudoRule:
         attrs = cls._create_ldap_mod_attrs(sudo_rule)
         cls._create_ldap_entry(connection, base_dn, attrs, sudo_rule)
         return sudo_rule
+
+    @classmethod
+    def get_object_by_guid(cls, guid):
+        ldap_service = LDAPObjectsService(LDAPSudoRule)
+        return ldap_service.get_object(guid)
+
+    @classmethod
+    def get_objects_list(cls):
+        ldap_service = LDAPObjectsService(LDAPSudoRule)
+        return list(ldap_service.get_objects())
 
     def apply_filter(self, filter_str):
         return (filter_str in self.name or
