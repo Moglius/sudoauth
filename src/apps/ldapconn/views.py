@@ -46,7 +46,6 @@ class LDAPUserViewSet(LDAPViewSet):
     def create(self, request, *args, **kwargs):
         serializer = LDAPUserGroupCreationSerializer(data=request.data)
         if serializer.is_valid():
-            print(serializer.get_guid())
             user = LDAPUser.create_object_by_guid(serializer.get_guid())
             serializer = LDAPUserSerializer(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -62,22 +62,26 @@ class LDAPObjectsService():
 
         return res
 
+    def _search_on_dn(self, dn, filterstr):
+        try:
+            return self.connection.search_s(
+                base=dn.dn,
+                scope=dn.get_scope(),
+                filterstr=filterstr,
+                attrlist=['*'])
+        except Exception as exc:
+            raise Http404 from exc
+
     def _ldap_search_by_guid(self, base_dn, guid):
         guid = ''.join([f"\\{guid[i:i+2]}" for i in range(0, len(guid), 2)])
-
+        filterstr = self.return_class.get_objectclass_filter(guid)
         for dn in base_dn:
-            try:
-                result = self.connection.search_s(
-                    base=dn.dn,
-                    scope=dn.get_scope(),
-                    filterstr=self.return_class.get_objectclass_filter(guid),
-                    attrlist=['*'])
-            except Exception as exc:
-                raise Http404 from exc
+            result = self._search_on_dn(dn, filterstr)
             if result:
                 break
-
-        return result[0] if result else Http404
+        if result:
+            return result[0]
+        raise Http404
 
     def _perform_search_by_guid(self, search_dname, guid):
         result = self._ldap_search_by_guid(search_dname, guid)

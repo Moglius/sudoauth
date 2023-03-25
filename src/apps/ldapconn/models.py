@@ -4,7 +4,8 @@ import binascii
 import ldap
 from ldap import modlist
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
+from rest_framework.serializers import ValidationError
 from apps.lnxusers.models import LnxUser, LnxGroup, LnxShell
 from .ldap import LDAPObjectsService
 
@@ -128,15 +129,20 @@ class LDAPUser:
             gid_number=int(entry_defaults['gidNumber'].decode('utf-8')))
         shell = LnxShell.objects.get(
             shell=entry_defaults['loginShell'].decode('utf-8'))
-        LnxUser.objects.create(
-            username=entry_defaults['uid'].decode('utf-8'),
-            uid_number=int(free_uid),
-            primary_group=primary_group,
-            login_shell=shell,
-            home_dir=entry_defaults['homeDirectory'].decode('utf-8'),
-            gecos=entry_defaults['gecos'].decode('utf-8'),
-            guidhex=guid
-        )
+        username = entry_defaults['uid'].decode('utf-8')
+        try:
+            LnxUser.objects.create(
+                username=username,
+                uid_number=int(free_uid),
+                primary_group=primary_group,
+                login_shell=shell,
+                home_dir=entry_defaults['homeDirectory'].decode('utf-8'),
+                gecos=entry_defaults['gecos'].decode('utf-8'),
+                guidhex=guid
+            )
+        except IntegrityError as exc:
+            raise ValidationError(
+                {"error": f"username '{username}' already exists."}) from exc
 
     @classmethod
     @transaction.atomic
@@ -156,7 +162,7 @@ class LDAPUser:
         ]
 
         ldap_conn.modify_s(ldap_entry.distinguishedName, mod_attrs)
-    
+
     @classmethod
     def perform_update(cls, ldap_conn, dn, instance):
         mod_attrs = [
@@ -190,7 +196,7 @@ class LDAPUser:
     def create_object_by_guid(cls, guid):
         ldap_service = LDAPObjectsService(LDAPUser)
         return ldap_service.create_object_by_guid(guid)
-    
+
     @classmethod
     def get_objects_list(cls):
         ldap_service = LDAPObjectsService(LDAPUser)
@@ -258,12 +264,17 @@ class LDAPGroup:
 
     @classmethod
     def _create_db_entry(cls, entry_defaults, guid, free_gid):
-        LnxGroup.objects.create(
-            groupname=entry_defaults['sAMAccountName'].decode('utf-8'),
-            gid_number=int(free_gid),
-            guidhex=guid
-        )
-    
+        try:
+            groupname = entry_defaults['sAMAccountName'].decode('utf-8')
+            LnxGroup.objects.create(
+                groupname=groupname,
+                gid_number=int(free_gid),
+                guidhex=guid
+            )
+        except IntegrityError as exc:
+            raise ValidationError(
+                {"error": f"Group '{groupname}' already exists."}) from exc
+
     @classmethod
     def perform_clear(cls, ldap_conn, ldap_entry):
         mod_attrs = [

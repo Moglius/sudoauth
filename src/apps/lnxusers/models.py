@@ -32,7 +32,7 @@ class LnxShell(models.Model):
 
 class LnxGroup(models.Model):
     groupname = models.CharField(max_length=65,
-        validators=[validate_username])
+        unique=True, validators=[validate_username])
     gid_number = models.BigIntegerField(unique=True)
     guidhex = models.CharField(max_length=60)
 
@@ -49,8 +49,8 @@ class LnxGroup(models.Model):
 
     def set_sudo_user(self):
         sudo_user = apps.get_model('sudoers.SudoUser')
-        self.related_group = sudo_user.objects.create(
-            username=self.get_sudo_user_name())
+        self.related_group = sudo_user.objects.get_or_create(
+            username=self.get_sudo_user_name())[0]
 
     def set_sudo_user_name(self):
         self.related_group.username = self.get_sudo_user_name()
