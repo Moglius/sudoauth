@@ -1,14 +1,13 @@
 from rest_framework import viewsets
 from rest_framework.serializers import ValidationError
 
-from apps.ldapconn.models import LDAPUser, LDAPGroup, LDAPSudoRule
+from apps.ldapconn.models import (LDAPUser, LDAPGroup,
+    LDAPSudoRule)
 from apps.sudoers.models import SudoUser
 from apps.ldapconfig.models import LDAPConfig
 from .models import LnxShell, LnxGroup, LnxUser
-from .serializers import (
-    LnxGroupSerializer, LnxShellSerializer,
-    LnxUserPutPatchSerializer, LnxUserListDetailSerializer
-)
+from .serializers import (LnxGroupSerializer, LnxShellSerializer,
+    LnxUserPutPatchSerializer, LnxUserListDetailSerializer)
 
 
 class LnxShellViewSet(viewsets.ModelViewSet):
