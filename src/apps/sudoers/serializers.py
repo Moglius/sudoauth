@@ -31,16 +31,14 @@ class SudoRuleListDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoRule
-        fields = ['pk', 'name', 'sudo_user', 'sudo_host',
-            'sudo_command', 'run_as_user', 'run_as_group']
+        fields = '__all__'
 
 
 class SudoRulePutPatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoRule
-        fields = ['pk', 'name', 'sudo_user', 'sudo_host',
-            'sudo_command', 'run_as_user', 'run_as_group']
+        fields = '__all__'
         extra_kwargs = {
             'name': {'read_only': True},
         }
@@ -50,5 +48,6 @@ class SudoRuleCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoRule
-        fields = ['pk', 'name', 'sudo_user', 'sudo_host',
-            'sudo_command', 'run_as_user', 'run_as_group']
+        #fields = ['pk', 'name', 'sudo_user', 'sudo_host',
+        #    'sudo_command', 'run_as_user', 'run_as_group']
+        fields = '__all__'

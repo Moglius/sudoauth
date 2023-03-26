@@ -7,6 +7,7 @@ from ldap import modlist
 from django.db import transaction, IntegrityError
 from rest_framework.serializers import ValidationError
 from apps.lnxusers.models import LnxUser, LnxGroup, LnxShell
+from apps.sudoers.models import SudoRule
 from .ldap import LDAPObjectsService
 
 
@@ -291,7 +292,7 @@ class LDAPGroup:
         cls._modify_ldap_entry(ldap_conn, free_gid, dn)
 
     @classmethod
-    def perform_update(cls, ldap_conn, dn, instance):
+    def perform_update(cls, ldap_conn, dn, instance: LnxGroup):
         mod_attrs = [
             ( ldap.MOD_REPLACE, "gidNumber", instance.get_ldap_gid())
         ]
@@ -372,27 +373,36 @@ class LDAPSudoRule:
         return sudo_rule
 
     @classmethod
-    def _create_ldap_mod_attrs(cls, sudo_rule):
+    def _create_ldap_mod_attrs(cls, sudo_rule: SudoRule):
         return [
-            ( ldap.MOD_REPLACE, "sudoRunAs", sudo_rule.run_as_user.username.encode('utf-8')),
-            ( ldap.MOD_REPLACE, "sudoRunAsUser", sudo_rule.run_as_user.username.encode('utf-8')),
-            ( ldap.MOD_REPLACE, "sudoRunAsGroup", sudo_rule.run_as_group.username.encode('utf-8')),
-            ( ldap.MOD_REPLACE, "sudoUser", [user.username.encode('utf-8') for user in sudo_rule.sudo_user.all()]),
-            ( ldap.MOD_REPLACE, "sudoCommand", [command.full_command.encode('utf-8') for command in sudo_rule.sudo_command.all()]),
-            ( ldap.MOD_REPLACE, "sudoHost", [host.hostname.encode('utf-8') for host in sudo_rule.sudo_host.all()]),
+            ( ldap.MOD_REPLACE, "sudoRunAs", sudo_rule.get_ldap_run_as_user()),
+            ( ldap.MOD_REPLACE, "sudoRunAsUser", sudo_rule.get_ldap_run_as_user()),
+            ( ldap.MOD_REPLACE, "sudoRunAsGroup", sudo_rule.get_ldap_run_as_group()),
+            ( ldap.MOD_REPLACE, "sudoUser", sudo_rule.get_ldap_sudouser_list()),
+            ( ldap.MOD_REPLACE, "sudoCommand", sudo_rule.get_ldap_command_list()),
+            ( ldap.MOD_REPLACE, "sudoHost", sudo_rule.get_ldap_host_list()),
+            ( ldap.MOD_REPLACE, "sudoNotAfter", sudo_rule.get_ldap_not_after()),
+            ( ldap.MOD_REPLACE, "sudoNotBefore", sudo_rule.get_ldap_not_before()),
+            ( ldap.MOD_REPLACE, "sudoOrder", sudo_rule.get_ldap_order())
         ]
 
     @classmethod
-    def _create_ldap_add_attrs(cls, sudo_rule):
+    def _create_ldap_add_attrs(cls, sudo_rule: SudoRule):
         attrs = {}
         attrs['objectclass'] = [b'top', b'sudoRole']
-        attrs['cn'] = sudo_rule.name.encode('utf-8')
-        attrs['sudoRunAs'] = sudo_rule.run_as_user.username.encode('utf-8')
-        attrs['sudoRunAsUser'] = sudo_rule.run_as_user.username.encode('utf-8')
-        attrs['sudoRunAsGroup'] = sudo_rule.run_as_group.username.encode('utf-8')
-        attrs['sudoUser'] = [user.username.encode('utf-8') for user in sudo_rule.sudo_user.all()]
-        attrs['sudoCommand'] = [command.full_command.encode('utf-8') for command in sudo_rule.sudo_command.all()]
-        attrs['sudoHost'] = [host.hostname.encode('utf-8') for host in sudo_rule.sudo_host.all()]
+        attrs['cn'] = sudo_rule.get_ldap_name()
+        attrs['sudoRunAs'] = sudo_rule.get_ldap_run_as_user()
+        attrs['sudoRunAsUser'] = sudo_rule.get_ldap_run_as_user()
+        attrs['sudoRunAsGroup'] = sudo_rule.get_ldap_run_as_group()
+        attrs['sudoUser'] = sudo_rule.get_ldap_sudouser_list()
+        attrs['sudoCommand'] = sudo_rule.get_ldap_command_list()
+        attrs['sudoHost'] = sudo_rule.get_ldap_host_list()
+        if sudo_rule.sudo_not_after:
+            attrs['sudoNotAfter'] = sudo_rule.get_ldap_not_after()
+        if sudo_rule.sudo_not_before:
+            attrs['sudoNotBefore'] = sudo_rule.get_ldap_not_before()
+        if sudo_rule.sudo_order:
+            attrs['sudoOrder'] = sudo_rule.get_ldap_order()
         return attrs
 
     @classmethod
