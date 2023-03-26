@@ -84,15 +84,22 @@ class LDAPUser:
         self.objectGUID = helper.get_guid(attrs, 'objectGUID')
         self.objectGUIDHex = helper.get_guid_hex(attrs, 'objectGUID')
 
+    def __eq__(self, other):
+        return self.objectGUIDHex == other.objectGUIDHex
+    
+    def __hash__(self):
+        return hash(self.objectGUIDHex)
+
+    @classmethod
+    def get_attributes_list(cls):
+        return ['distinguishedName', 'name', 'userPrincipalName', 'cn',
+            'sAMAccountName', 'givenName', 'sn', 'objectSid', 'objectGUID']
+
     @classmethod
     def get_objectclass_filter(cls, guid=None):
         if guid:
             return f"(&(objectClass=Person)(userPrincipalName=*)(objectGUID={guid}))"
         return "(&(objectClass=Person)(userPrincipalName=*))"
-
-    @classmethod
-    def get_attributes_list(cls):
-        return ['*']
 
     @classmethod
     def get_dn_to_search(cls, ldap_config):

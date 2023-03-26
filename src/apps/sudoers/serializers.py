@@ -48,6 +48,4 @@ class SudoRuleCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoRule
-        #fields = ['pk', 'name', 'sudo_user', 'sudo_host',
-        #    'sudo_command', 'run_as_user', 'run_as_group']
         fields = '__all__'

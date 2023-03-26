@@ -94,7 +94,6 @@ class SudoRuleViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        print(response.data)
         instance = SudoRule.objects.get(pk=response.data['id'])
         LDAPSudoRule.create_or_update_sudo_rule(instance)
         return response

@@ -43,14 +43,14 @@ class LDAPObjectsService():
             base=base_dn.dn,
             scope=base_dn.get_scope(),
             filterstr=self.filterstr,
-            attrlist=['*'],
+            attrlist=self.attrlist,
             serverctrls=[ctrl],
-            timeout=5
+            timeout=50
         )
 
         _r_type, res, _r_mid, srv_crtls = self.connection.result3(
             msgid,
-            timeout=5,
+            timeout=50,
         )
         return res, srv_crtls
 
@@ -104,7 +104,7 @@ class LDAPObjectsService():
         return False
 
     def _set_cookie(self, search_res):
-        for ldap_search in search_res:
+        for ldap_search in search_res.values():
             page_crtl = self._get_page_control(ldap_search['ctrl'])
             if page_crtl.cookie:
                 ldap_search['cookie'].cookie = page_crtl.cookie
