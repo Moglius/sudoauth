@@ -38,7 +38,6 @@ class LDAPObjectsService():
         return self.return_class.get_dn_to_search(self.ldap_config)
 
     def _ldap_search(self, base_dn, ctrl):
-
         msgid = self.connection.search_ext(
             base=base_dn.dn,
             scope=base_dn.get_scope(),
@@ -104,10 +103,28 @@ class LDAPObjectsService():
         return False
 
     def _set_cookie(self, search_res):
-        for ldap_search in search_res.values():
+        keep_dn_search = []
+        remove_dn_search = []
+        for key, ldap_search in search_res.items():
             page_crtl = self._get_page_control(ldap_search['ctrl'])
             if page_crtl.cookie:
+                keep_dn_search.append(key)
                 ldap_search['cookie'].cookie = page_crtl.cookie
+            else:
+                remove_dn_search.append(key)
+
+        for key in remove_dn_search:
+            del search_res[key]
+        return keep_dn_search
+
+    def _get_dn_ramaining_dn(self, search_dname, keep_dn_search):
+
+        new_search_dname = []
+        for search_dn in search_dname:
+            if search_dn.pk in keep_dn_search:
+                new_search_dname.append(search_dn)
+
+        return new_search_dname
 
     def _create_working_dictionary(self, search_dname):
 
@@ -125,20 +142,21 @@ class LDAPObjectsService():
 
     def get_objects(self):
 
-        search_dname = self._get_dn_to_search()
+        search_dname = list(self._get_dn_to_search())
         search_res = self._create_working_dictionary(search_dname)
 
         while True:
-
             self._perform_search(search_res, search_dname)
 
             for search in search_res.values():
                 for d_name, attrs in search['res']:
+                    print(attrs)
                     if d_name is not None:
                         yield self._create_return_object(d_name, attrs)
 
             if self._more_ldap_pages(search_res):
-                self._set_cookie(search_res)
+                keep_dn_search = self._set_cookie(search_res)
+                search_dname = self._get_dn_ramaining_dn(search_dname, keep_dn_search)
             else:
                 break
 

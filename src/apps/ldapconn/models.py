@@ -238,7 +238,8 @@ class LDAPGroup:
 
     @classmethod
     def get_attributes_list(cls):
-        return ['*']
+        return ['distinguishedName', 'description', 'sAMAccountName',
+            'member', 'memberOf', 'objectSid', 'objectGUID']
 
     @classmethod
     def get_dn_to_search(cls, ldap_config):
@@ -367,7 +368,9 @@ class LDAPSudoRule:
 
     @classmethod
     def get_attributes_list(cls):
-        return ['*']
+        return ['distinguishedName', 'name', 'cn', 'description', 'sudoCommand',
+            'sudoHost', 'sudoOption', 'sudoRunAsUser', 'sudoRunAsGroup', 'sudoUser',
+            'sudoNotAfter', 'sudoNotBefore', 'sudoOrder', 'objectGUID']
 
     @classmethod
     def get_dn_to_search(cls, ldap_config):
