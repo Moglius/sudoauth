@@ -150,7 +150,6 @@ class LDAPObjectsService():
 
             for search in search_res.values():
                 for d_name, attrs in search['res']:
-                    print(attrs)
                     if d_name is not None:
                         yield self._create_return_object(d_name, attrs)
 
