@@ -1,0 +1,35 @@
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-end">
+    <li class="page-item">
+      <button class="page-link" (click)="fetchPrevious()">Previous</button>
+    </li>
+    <li class="page-item">
+      <button class="page-link" (click)="fetchNext()">Next</button>
+    </li>
+  </ul>
+</nav>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>shell</th>
+      <th>built_in</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let lnxuser of lnxshellList">
+      <td>{{ lnxuser.pk }}</td>
+      <td>{{ lnxuser.shell }}</td>
+      <td>{{ lnxuser.built_in }}</td>
+      <td>
+        <button type="button" class="btn btn-warning mr">
+          Edit
+        </button>
+        <button type="button" class="btn btn-danger mr-1">
+          Remove
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
