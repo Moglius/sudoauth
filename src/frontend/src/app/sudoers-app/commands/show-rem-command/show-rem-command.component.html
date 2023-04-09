@@ -1,0 +1,39 @@
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-end">
+    <li class="page-item" [ngClass]="{disabled: previous === ''}">
+      <button  class="page-link" (click)="fetchPrevious()">Previous</button>
+    </li>
+    <li class="page-item" [ngClass]="{disabled: next === ''}">
+      <button class="page-link" (click)="fetchNext()">Next</button>
+    </li>
+  </ul>
+</nav>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>diggest</th>
+      <th>command</th>
+      <th>args</th>
+      <th>full_command</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody class="table-group-divider">
+    <tr *ngFor="let command of commandsList">
+      <td>{{ command.pk}}</td>
+      <td>{{ command.diggest || '-' }}</td>
+      <td>{{ command.command }}</td>
+      <td>{{ command.args || '-' }}</td>
+      <td>{{ command.full_command }}</td>
+      <td>
+        <button type="button" class="btn btn-warning mr">
+          Edit
+        </button>
+        <button type="button" class="btn btn-danger mr-1">
+          Remove
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

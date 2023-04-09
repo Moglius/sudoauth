@@ -1,20 +1,42 @@
 <div class="container">
+
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">SUDOauth</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a routerLink="lnxusers" class="nav-link">LnxUsers</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Lnxusers app
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" routerLink="lnxusers">LnxUsers</a></li>
+              <li><a class="dropdown-item" routerLink="lnxgroups">LnxGroups</a></li>
+              <li><a class="dropdown-item" routerLink="lnxshells">Lnxshells</a></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a routerLink="lnxgroups" class="nav-link">LnxGroups</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Ldapusers app
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" routerLink="ldapusers">Ldapusers</a></li>
+              <li><a class="dropdown-item" routerLink="ldapgroups">Ldapgroups</a></li>
+              <li><a class="dropdown-item" routerLink="ldaprules">Ldaprules</a></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a routerLink="lnxshells" class="nav-link">LnxShells</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Sudoers app
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" routerLink="sudorules">Sudorules</a></li>
+              <li><a class="dropdown-item" routerLink="hosts">Hosts</a></li>
+              <li><a class="dropdown-item" routerLink="commands">Commands</a></li>
+            </ul>
           </li>
         </ul>
       </div>
