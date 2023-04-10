@@ -14,7 +14,7 @@ export class ShowRemLdapuserComponent implements OnInit{
   previous: string = '';
   modalTitle: string = '';
   activateAddEditComponent: boolean = false;
-  ldapuser_dep: any;
+  ldapuser_dep = {};
 
   constructor(private service: LnxuserService) {}
 
@@ -51,8 +51,20 @@ export class ShowRemLdapuserComponent implements OnInit{
   }
 
   addClick(ldapuser: any){
-    this.ldapuser_dep = ldapuser;
+    this.ldapuser_dep = {
+      'ldapuser': ldapuser,
+      'add': true
+    };
     this.modalTitle = 'Add User';
+    this.activateAddEditComponent = true;
+  }
+
+  showClick(ldapuser: any){
+    this.ldapuser_dep = {
+      'ldapuser': ldapuser,
+      'add': false
+    };
+    this.modalTitle = 'Show User';
     this.activateAddEditComponent = true;
   }
 

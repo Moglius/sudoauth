@@ -35,7 +35,7 @@
           </button>
           <button type="button" class="btn btn-info btn-block"
           data-bs-toggle="modal" data-bs-target="#exampleModal"
-          (click)="addClick(ldapuser)" data-backdrop="static" data-keyboard="false">
+          (click)="showClick(ldapuser)" data-backdrop="static" data-keyboard="false">
             Info
           </button>
         </div>
@@ -46,15 +46,16 @@
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">{{ modalTitle }}</h1>
         <button type="button" class="btn-close"
-        data-bs-dismiss="modal" aria-label="Close" (click)="closeClick()"></button>
+        data-bs-dismiss="modal" aria-label="Close" (click)="closeClick()" (closeChild)="closeClick()"></button>
       </div>
       <div class="modal-body">
-        <app-add-edit-ldapuser [ldapuser_dep]='ldapuser_dep' *ngIf="activateAddEditComponent"></app-add-edit-ldapuser>
+        <app-add-edit-ldapuser [ldapuser_dep]='ldapuser_dep'
+        *ngIf="activateAddEditComponent" (closeChild)="activateAddEditComponent = false"></app-add-edit-ldapuser>
       </div>
     </div>
   </div>
