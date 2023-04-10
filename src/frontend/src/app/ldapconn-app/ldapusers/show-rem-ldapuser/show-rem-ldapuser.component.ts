@@ -12,6 +12,9 @@ export class ShowRemLdapuserComponent implements OnInit{
   ldapuserList: any = [];
   next: string = '';
   previous: string = '';
+  modalTitle: string = '';
+  activateAddEditComponent: boolean = false;
+  ldapuser_dep: any;
 
   constructor(private service: LnxuserService) {}
 
@@ -45,6 +48,17 @@ export class ShowRemLdapuserComponent implements OnInit{
 
   fetchPrevious() {
     this.refreshLdapUsersList(this.previous);
+  }
+
+  addClick(ldapuser: any){
+    this.ldapuser_dep = ldapuser;
+    this.modalTitle = 'Add User';
+    this.activateAddEditComponent = true;
+  }
+
+  closeClick(){
+    this.activateAddEditComponent = false;
+    this.refreshLdapUsersList(this.apiurl);
   }
 
 }

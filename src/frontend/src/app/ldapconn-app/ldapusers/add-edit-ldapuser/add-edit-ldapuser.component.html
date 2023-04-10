@@ -1,1 +1,13 @@
-<p>add-edit-ldapuser works!</p>
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">objectGUIDHex</span>
+  <input type="text" class="form-control" placeholder="Username" disabled
+  aria-label="Username" aria-describedby="basic-addon1" [ngModel]="objectGUIDHex">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">sAMAccountName</span>
+  <input type="text" class="form-control" placeholder="Username" disabled
+  aria-label="Username" aria-describedby="basic-addon1" [ngModel]="sAMAccountName">
+</div>
+
+<button (click)="addLdapUser()" class="btn btn-primary">Add</button>

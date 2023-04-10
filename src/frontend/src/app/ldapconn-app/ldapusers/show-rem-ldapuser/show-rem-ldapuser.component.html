@@ -27,13 +27,35 @@
       <td>{{ ldapuser.objectSid }}</td>
       <td>{{ ldapuser.objectGUID }}</td>
       <td>
-        <button type="button" class="btn btn-warning mr">
-          Edit
-        </button>
-        <button type="button" class="btn btn-danger mr-1">
-          Remove
-        </button>
+        <div class="row">
+          <button type="button" class="btn btn-primary btn-block"
+          data-bs-toggle="modal" data-bs-target="#exampleModal"
+          (click)="addClick(ldapuser)" data-backdrop="static" data-keyboard="false">
+            Add
+          </button>
+          <button type="button" class="btn btn-info btn-block"
+          data-bs-toggle="modal" data-bs-target="#exampleModal"
+          (click)="addClick(ldapuser)" data-backdrop="static" data-keyboard="false">
+            Info
+          </button>
+        </div>
       </td>
     </tr>
   </tbody>
 </table>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">{{ modalTitle }}</h1>
+        <button type="button" class="btn-close"
+        data-bs-dismiss="modal" aria-label="Close" (click)="closeClick()"></button>
+      </div>
+      <div class="modal-body">
+        <app-add-edit-ldapuser [ldapuser_dep]='ldapuser_dep' *ngIf="activateAddEditComponent"></app-add-edit-ldapuser>
+      </div>
+    </div>
+  </div>
+</div>

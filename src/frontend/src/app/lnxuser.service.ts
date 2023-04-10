@@ -12,4 +12,16 @@ export class LnxuserService {
   getLnxUsersList(url: string): Observable<any>{
     return this.http.get<any>(url);
   }
+
+  addEntry(url: string, val: any){
+    return this.http.post(url, val)
+  }
+
+  updateEntry(url: string, val: any){
+    return this.http.put(url, val)
+  }
+
+  deleteEntry(url: string, val: any){
+    return this.http.delete(url + val)
+  }
 }
