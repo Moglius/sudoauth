@@ -12,6 +12,12 @@ export class ShowRemRulesComponent implements OnInit {
   ldaprulesList: any = [];
   next: string = '';
   previous: string = '';
+  modalTitle: string = '';
+  activateAddEditComponent: boolean = false;
+  ldaprule_dep = {};
+
+  ldaprulesFilter: string = "";
+  ldaprulesListWithoutFilter: any = [];
 
   constructor(private service: LnxuserService) {}
 
@@ -22,6 +28,7 @@ export class ShowRemRulesComponent implements OnInit {
   refreshLdapRulesList(url: string) {
     this.service.getLnxUsersList(url).subscribe(data=>{
       this.ldaprulesList = data.results;
+      this.ldaprulesListWithoutFilter = data.results;
 
       if (data.next) {
         this.next = data.next;
@@ -45,6 +52,33 @@ export class ShowRemRulesComponent implements OnInit {
 
   fetchPrevious() {
     this.refreshLdapRulesList(this.previous);
+  }
+
+  showClick(ldaprule: any){
+    this.ldaprule_dep = {
+      'ldaprule': ldaprule,
+      'add': false
+    };
+    this.modalTitle = 'Show Sudo Rule';
+    this.activateAddEditComponent = true;
+  }
+
+  closeClick(){
+    this.activateAddEditComponent = false;
+    this.refreshLdapRulesList(this.apiurl);
+  }
+
+  FilterFn(){
+    var ldaprulesFilter = this.ldaprulesFilter;
+
+    this.ldaprulesList = this.ldaprulesListWithoutFilter.filter(function (ldaprule: any){
+        return ldaprule.objectGUIDHex.toString().toLowerCase().includes(
+          ldaprulesFilter.toString().trim().toLowerCase()
+        )||
+        ldaprule.cn.toString().toLowerCase().includes(
+          ldaprulesFilter.toString().trim().toLowerCase()
+        )
+    });
   }
 
 }

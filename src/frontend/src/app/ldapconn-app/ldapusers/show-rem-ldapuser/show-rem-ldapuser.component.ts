@@ -16,6 +16,9 @@ export class ShowRemLdapuserComponent implements OnInit{
   activateAddEditComponent: boolean = false;
   ldapuser_dep = {};
 
+  ldapusersFilter: string = "";
+  ldapusersListWithoutFilter: any = [];
+
   constructor(private service: LnxuserService) {}
 
   ngOnInit(): void {
@@ -25,6 +28,7 @@ export class ShowRemLdapuserComponent implements OnInit{
   refreshLdapUsersList(url: string) {
     this.service.getLnxUsersList(url).subscribe(data=>{
       this.ldapuserList = data.results;
+      this.ldapusersListWithoutFilter = data.results;
 
       if (data.next) {
         this.next = data.next;
@@ -71,6 +75,19 @@ export class ShowRemLdapuserComponent implements OnInit{
   closeClick(){
     this.activateAddEditComponent = false;
     this.refreshLdapUsersList(this.apiurl);
+  }
+
+  FilterFn(){
+    var ldapusersFilter = this.ldapusersFilter;
+
+    this.ldapuserList = this.ldapusersListWithoutFilter.filter(function (ldapuser: any){
+        return ldapuser.sAMAccountName.toString().toLowerCase().includes(
+          ldapusersFilter.toString().trim().toLowerCase()
+        )||
+        ldapuser.objectGUIDHex.toString().toLowerCase().includes(
+          ldapusersFilter.toString().trim().toLowerCase()
+        )
+    });
   }
 
 }

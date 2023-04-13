@@ -12,6 +12,12 @@ export class ShowRemLdapgroupComponent implements OnInit{
   ldapgroupList: any = [];
   next: string = '';
   previous: string = '';
+  modalTitle: string = '';
+  activateAddEditComponent: boolean = false;
+  ldapgroup_dep = {};
+
+  ldapgroupsFilter: string = "";
+  ldapgroupsListWithoutFilter: any = [];
 
   constructor(private service: LnxuserService) {}
 
@@ -22,6 +28,7 @@ export class ShowRemLdapgroupComponent implements OnInit{
   refreshLdapGroupsList(url: string) {
     this.service.getLnxUsersList(url).subscribe(data=>{
       this.ldapgroupList = data.results;
+      this.ldapgroupsListWithoutFilter = data.results;
 
       if (data.next) {
         this.next = data.next;
@@ -45,6 +52,42 @@ export class ShowRemLdapgroupComponent implements OnInit{
 
   fetchPrevious() {
     this.refreshLdapGroupsList(this.previous);
+  }
+
+  addClick(ldapgroup: any){
+    this.ldapgroup_dep = {
+      'ldapgroup': ldapgroup,
+      'add': true
+    };
+    this.modalTitle = 'Add Group';
+    this.activateAddEditComponent = true;
+  }
+
+  showClick(ldapgroup: any){
+    this.ldapgroup_dep = {
+      'ldapgroup': ldapgroup,
+      'add': false
+    };
+    this.modalTitle = 'Show Group';
+    this.activateAddEditComponent = true;
+  }
+
+  closeClick(){
+    this.activateAddEditComponent = false;
+    this.refreshLdapGroupsList(this.apiurl);
+  }
+
+  FilterFn(){
+    var ldapgroupsFilter = this.ldapgroupsFilter;
+
+    this.ldapgroupList = this.ldapgroupsListWithoutFilter.filter(function (ldapgroup: any){
+        return ldapgroup.sAMAccountName.toString().toLowerCase().includes(
+          ldapgroupsFilter.toString().trim().toLowerCase()
+        )||
+        ldapgroup.objectGUIDHex.toString().toLowerCase().includes(
+          ldapgroupsFilter.toString().trim().toLowerCase()
+        )
+    });
   }
 
 }

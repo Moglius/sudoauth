@@ -1,5 +1,11 @@
 <nav aria-label="Page navigation">
   <ul class="pagination justify-content-end">
+    <li>
+      <div class="page-item">
+        <input [(ngModel)]="ldaprulesFilter" class="form-control"
+        (keyup)="FilterFn()" placeholder="Filter sudo rules">
+      </div>
+    </li>
     <li class="page-item" [ngClass]="{disabled: previous === ''}">
       <button  class="page-link" (click)="fetchPrevious()">Previous</button>
     </li>
@@ -25,14 +31,31 @@
       <td>{{ ldaprule.sudoCommand }}</td>
       <td>{{ ldaprule.objectGUID }}</td>
       <td>
-        <button type="button" class="btn btn-warning mr">
-          Edit
-        </button>
-        <button type="button" class="btn btn-danger mr-1">
-          Remove
-        </button>
+        <div class="row">
+          <button type="button" class="btn btn-info btn-block"
+          data-bs-toggle="modal" data-bs-target="#exampleModal"
+          (click)="showClick(ldaprule)" data-backdrop="static" data-keyboard="false">
+            Info
+          </button>
+        </div>
       </td>
     </tr>
   </tbody>
 </table>
 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">{{ modalTitle }}</h1>
+        <button type="button" class="btn-close"
+        data-bs-dismiss="modal" aria-label="Close" (click)="closeClick()" (closeChild)="closeClick()"></button>
+      </div>
+      <div class="modal-body">
+        <app-add-edit-rules [ldaprule_dep]='ldaprule_dep'
+        *ngIf="activateAddEditComponent" (closeChild)="activateAddEditComponent = false"></app-add-edit-rules>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,35 @@
-<p>add-edit-ldapgroup works!</p>
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">objectGUIDHex (ID)</span>
+  <input type="text" class="form-control" placeholder="objectGUIDHex" disabled
+  aria-label="objectGUIDHex" aria-describedby="basic-addon1" [ngModel]="ldapgroup.objectGUIDHex">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">distinguishedName</span>
+  <input type="text" class="form-control" placeholder="distinguishedName" disabled
+  aria-label="distinguishedName" aria-describedby="basic-addon1" [ngModel]="ldapgroup.distinguishedName">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">sAMAccountName</span>
+  <input type="text" class="form-control" placeholder="sAMAccountName" disabled
+  aria-label="sAMAccountName" aria-describedby="basic-addon1" [ngModel]="ldapgroup.sAMAccountName">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">Display Name</span>
+  <input type="text" class="form-control" placeholder="name" disabled
+  aria-label="name" aria-describedby="basic-addon1" [ngModel]="ldapgroup.name">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">objectSid</span>
+  <input type="text" class="form-control" placeholder="objectSid" disabled
+  aria-label="objectSid" aria-describedby="basic-addon1" [ngModel]="ldapgroup.objectSid">
+</div>
+
+<div>
+<button *ngIf="addFrom" (click)="addLdapGroup(ldapgroup)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
