@@ -18,18 +18,37 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let lnxuser of lnxshellList">
-      <td>{{ lnxuser.pk }}</td>
-      <td>{{ lnxuser.shell }}</td>
-      <td>{{ lnxuser.built_in }}</td>
+    <tr *ngFor="let lnxshell of lnxshellList">
+      <td>{{ lnxshell.pk }}</td>
+      <td>{{ lnxshell.shell }}</td>
+      <td>{{ lnxshell.built_in }}</td>
       <td>
-        <button type="button" class="btn btn-warning mr">
-          Edit
-        </button>
-        <button type="button" class="btn btn-danger mr-1">
-          Remove
-        </button>
+          <button type="button" class="btn btn-info"
+          data-bs-toggle="modal" data-bs-target="#exampleModal"
+          (click)="editClick(lnxshell)" data-backdrop="static" data-keyboard="false">
+            Edit
+          </button>
+          <button type="button" class="btn btn-danger" (click)="deleteClick(lnxshell)">
+            Delete
+          </button>
       </td>
     </tr>
   </tbody>
 </table>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">{{ modalTitle }}</h1>
+        <button type="button" class="btn-close"
+        data-bs-dismiss="modal" aria-label="Close" (click)="closeClick()" (closeChild)="closeClick()"></button>
+      </div>
+      <div class="modal-body">
+        <app-add-edit-lnxshell [lnxshell_dep]='lnxshell_dep'
+        *ngIf="activateAddEditComponent" (closeChild)="activateAddEditComponent = false"></app-add-edit-lnxshell>
+      </div>
+    </div>
+  </div>
+</div>

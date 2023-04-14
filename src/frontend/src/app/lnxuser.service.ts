@@ -18,10 +18,10 @@ export class LnxuserService {
   }
 
   updateEntry(url: string, val: any){
-    return this.http.put(url, val)
+    return this.http.patch(url, val);
   }
 
-  deleteEntry(url: string, val: any){
-    return this.http.delete(url + val)
+  deleteEntry(url: string){
+    return this.http.delete(url);
   }
 }

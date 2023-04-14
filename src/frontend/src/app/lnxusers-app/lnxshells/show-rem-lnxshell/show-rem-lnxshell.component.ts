@@ -12,6 +12,9 @@ export class ShowRemLnxshellComponent implements OnInit{
   lnxshellList: any = [];
   next: string = '';
   previous: string = '';
+  modalTitle: string = '';
+  activateAddEditComponent: boolean = false;
+  lnxshell_dep = {};
 
   constructor(private service: LnxuserService) {}
 
@@ -41,5 +44,29 @@ export class ShowRemLnxshellComponent implements OnInit{
 
   fetchPrevious() {
     this.refreshLnxShellsList(this.previous);
+  }
+
+  editClick(lnxshell: any){
+    this.lnxshell_dep = {
+      'lnxshell': lnxshell,
+      'edit': true
+    };
+    this.modalTitle = 'Edit Shell';
+    this.activateAddEditComponent = true;
+  }
+
+  deleteClick(lnxshell: any) {
+
+    if (confirm('are you sure?')) {
+      this.service.deleteEntry(this.apiurl + lnxshell.pk + '/').subscribe(data => {
+        this.refreshLnxShellsList(this.apiurl);
+      });
+    }
+
+  }
+
+  closeClick(){
+    this.activateAddEditComponent = false;
+    this.refreshLnxShellsList(this.apiurl);
   }
 }
