@@ -1,1 +1,22 @@
-<p>add-edit-lnxgroup works!</p>
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">ID</span>
+  <input type="text" class="form-control" placeholder="id" disabled
+  aria-label="id" aria-describedby="basic-addon1" [ngModel]="lnxgroup.pk">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">groupname</span>
+  <input type="text" class="form-control" placeholder="groupname" disabled
+  aria-label="groupname" aria-describedby="basic-addon1" [ngModel]="lnxgroup.groupname">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">gid_numer</span>
+  <input type="text" class="form-control" placeholder="gid_numer"
+  aria-label="gid_numer" aria-describedby="basic-addon1" [(ngModel)]="lnxgroup.gid_number">
+</div>
+
+<div>
+<button (click)="updateLnxGroup(lnxgroup)" data-bs-dismiss="modal" class="btn btn-primary">Edit</button>
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeClick()">Close</button>
+</div>

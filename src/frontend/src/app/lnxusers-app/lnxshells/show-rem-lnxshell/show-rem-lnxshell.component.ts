@@ -8,6 +8,8 @@ import { LnxuserService } from 'src/app/lnxuser.service';
 })
 export class ShowRemLnxshellComponent implements OnInit{
 
+  constructor(private service: LnxuserService) {}
+
   readonly apiurl = 'http://localhost:8000/api/lnxusers/shells/';
   lnxshellList: any = [];
   next: string = '';
@@ -16,7 +18,9 @@ export class ShowRemLnxshellComponent implements OnInit{
   activateAddEditComponent: boolean = false;
   lnxshell_dep = {};
 
-  constructor(private service: LnxuserService) {}
+  lnxshellsFilter: string = "";
+  lnxshellsListWithoutFilter: any = [];
+  addButtonText = 'Add LnxShell';
 
   ngOnInit(): void {
     this.refreshLnxShellsList(this.apiurl);
@@ -25,6 +29,7 @@ export class ShowRemLnxshellComponent implements OnInit{
   refreshLnxShellsList(url: string) {
     this.service.getLnxUsersList(url).subscribe(data=>{
       this.lnxshellList = data.results;
+      this.lnxshellsListWithoutFilter = data.results;
 
       if (data.next) {
         this.next = data.next;
@@ -46,6 +51,15 @@ export class ShowRemLnxshellComponent implements OnInit{
     this.refreshLnxShellsList(this.previous);
   }
 
+  addClick(){
+    this.lnxshell_dep = {
+      'lnxshell': '',
+      'edit': false
+    };
+    this.modalTitle = 'Add Shell';
+    this.activateAddEditComponent = true;
+  }
+
   editClick(lnxshell: any){
     this.lnxshell_dep = {
       'lnxshell': lnxshell,
@@ -56,17 +70,27 @@ export class ShowRemLnxshellComponent implements OnInit{
   }
 
   deleteClick(lnxshell: any) {
-
     if (confirm('are you sure?')) {
       this.service.deleteEntry(this.apiurl + lnxshell.pk + '/').subscribe(data => {
         this.refreshLnxShellsList(this.apiurl);
       });
     }
-
   }
 
   closeClick(){
     this.activateAddEditComponent = false;
     this.refreshLnxShellsList(this.apiurl);
+    this.lnxshell_dep = {};
+  }
+
+  FilterFn(){
+    var lnxshellsFilter = this.lnxshellsFilter;
+
+    this.lnxshellList = this.lnxshellsListWithoutFilter.filter(function (ldaprule: any){
+        return ldaprule.shell.toString().toLowerCase().includes(
+          lnxshellsFilter.toString().trim().toLowerCase()
+        )
+    });
+
   }
 }

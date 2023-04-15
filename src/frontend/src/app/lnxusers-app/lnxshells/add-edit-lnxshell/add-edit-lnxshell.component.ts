@@ -10,7 +10,8 @@ export class AddEditLnxshellComponent implements OnInit{
 
   constructor(private service: LnxuserService) {  }
 
-  @Output() closeChild = new EventEmitter();
+  @Output() closeChild: EventEmitter<any> = new EventEmitter();
+
   @Input() lnxshell_dep: any;
   readonly url: string = 'http://localhost:8000/api/lnxusers/shells/'
   lnxshell: any;
@@ -21,9 +22,20 @@ export class AddEditLnxshellComponent implements OnInit{
     this.putFrom = this.lnxshell_dep['edit'];
   }
 
-  addLnxShell(lnxshell: any){
+  updateLnxShell(lnxshell: any){
     let val = { 'shell': lnxshell.shell }
     this.service.updateEntry(this.url + lnxshell.pk + '/', val).subscribe();
+    this.closeChild.emit(null);
+  }
+
+  addLnxShell(lnxshell: any){
+    let val = { 'shell': lnxshell }
+    this.service.addEntry(this.url, val).subscribe(() => {
+      this.closeChild.emit(null);
+    });
+  }
+
+  closeClick(){
     this.closeChild.emit(null);
   }
 

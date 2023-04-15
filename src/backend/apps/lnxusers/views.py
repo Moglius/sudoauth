@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.serializers import ValidationError
 
@@ -59,22 +60,23 @@ class LnxGroupViewSet(viewsets.ModelViewSet):
             LDAPUser.update_lnxuser(lnxuser)
         return default_group
 
-    def _remove_sudouser_from_sudorules(self, sudo_user: SudoUser):
-        sudo_rules = sudo_user.get_attached_sudorules()
-        sudo_user.delete()
-        for sudo_rule in sudo_rules:
+    def _remove_sudouser_from_sudorules(self, sudorules):
+        for sudo_rule in sudorules:
             LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
-        return sudo_rules
+        return sudorules
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.is_default_group():
+        lnxgroup = self.get_object()
+        if lnxgroup.is_default_group():
             raise ValidationError('This group is seleted as default in your config.'\
                                   'Can not be deleted.')
-        self._set_lnxuser_default_group(instance)
-        self._remove_sudouser_from_sudorules(instance.related_group)
-        LDAPGroup.clear_lnxgroup(instance)
-        return super().destroy(request, *args, **kwargs)
+        self._set_lnxuser_default_group(lnxgroup)
+        sudorules = lnxgroup.related_group.get_attached_sudorules()
+        LDAPGroup.clear_lnxgroup(lnxgroup)
+        response = super().destroy(request, *args, **kwargs)
+        lnxgroup.related_group.delete()
+        self._remove_sudouser_from_sudorules(sudorules)
+        return response
 
     def partial_update(self, request, *args, **kwargs):
         response = super().partial_update(request, *args, **kwargs)

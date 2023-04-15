@@ -1,16 +1,23 @@
-<div class="input-group mb-3">
+<div *ngIf="putFrom" class="input-group mb-3">
   <span class="input-group-text" id="basic-addon1">ID</span>
   <input type="text" class="form-control" placeholder="id" disabled
   aria-label="id" aria-describedby="basic-addon1" [ngModel]="lnxshell.pk">
 </div>
 
-<div class="input-group mb-3">
+<div *ngIf="putFrom" class="input-group mb-3">
   <span class="input-group-text" id="basic-addon1">lnxshell</span>
   <input type="text" class="form-control" placeholder="lnxshell"
   aria-label="lnxshell" aria-describedby="basic-addon1" [(ngModel)]="lnxshell.shell">
 </div>
 
+<div *ngIf="! putFrom" class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">lnxshell</span>
+  <input type="text" class="form-control" placeholder="lnxshell"
+  aria-label="lnxshell" aria-describedby="basic-addon1" [(ngModel)]="lnxshell">
+</div>
+
 <div>
-<button *ngIf="putFrom" (click)="addLnxShell(lnxshell)" data-bs-dismiss="modal" class="btn btn-primary">Edit</button>
-<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<button *ngIf="putFrom" (click)="updateLnxShell(lnxshell)" data-bs-dismiss="modal" class="btn btn-primary">Edit</button>
+<button *ngIf="! putFrom" (click)="addLnxShell(lnxshell)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeClick()">Close</button>
 </div>

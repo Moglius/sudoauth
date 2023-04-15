@@ -13,6 +13,13 @@ export class ShowRemLnxgroupComponent implements OnInit{
   next: string = '';
   previous: string = '';
 
+  modalTitle: string = '';
+  activateAddEditComponent: boolean = false;
+  lnxgroup_dep = {};
+
+  lnxgroupsFilter: string = "";
+  lnxgroupsListWithoutFilter: any = [];
+
   constructor(private service: LnxuserService) {}
 
   ngOnInit(): void {
@@ -22,6 +29,7 @@ export class ShowRemLnxgroupComponent implements OnInit{
   refreshLnxGroupsList(url: string) {
     this.service.getLnxUsersList(url).subscribe(data=>{
       this.lnxgroupList = data.results;
+      this.lnxgroupsListWithoutFilter = data.results;
 
       if (data.next) {
         this.next = data.next;
@@ -41,6 +49,42 @@ export class ShowRemLnxgroupComponent implements OnInit{
 
   fetchPrevious() {
     this.refreshLnxGroupsList(this.previous);
+  }
+
+  editClick(lnxgroup: any){
+    this.lnxgroup_dep = {
+      'lnxgroup': lnxgroup,
+      'edit': true
+    };
+    this.modalTitle = 'Edit Group';
+    this.activateAddEditComponent = true;
+  }
+
+  deleteClick(lnxgroup: any) {
+    if (confirm('are you sure?')) {
+      this.service.deleteEntry(this.apiurl + lnxgroup.pk + '/').subscribe(data => {
+        this.refreshLnxGroupsList(this.apiurl);
+      });
+    }
+  }
+
+  closeClick(){
+    this.activateAddEditComponent = false;
+    this.refreshLnxGroupsList(this.apiurl);
+    this.lnxgroup_dep = {};
+  }
+
+  FilterFn(){
+    var lnxgroupsFilter = this.lnxgroupsFilter;
+
+    this.lnxgroupList = this.lnxgroupsListWithoutFilter.filter(function (lnxgroup: any){
+        return lnxgroup.groupname.toString().toLowerCase().includes(
+          lnxgroupsFilter.toString().trim().toLowerCase()
+        )||
+        lnxgroup.gid_number.toString().toLowerCase().includes(
+          lnxgroupsFilter.toString().trim().toLowerCase()
+        )
+    });
   }
 
 }
