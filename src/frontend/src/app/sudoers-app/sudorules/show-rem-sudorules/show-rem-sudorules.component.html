@@ -23,8 +23,8 @@
     <tr *ngFor="let sudorule of sudorulesList">
       <td>{{ sudorule.id }}</td>
       <td>{{ sudorule.name }}</td>
-      <td>{{ sudorule.sudo_command }}</td>
-      <td>{{ sudorule.sudo_host }}</td>
+      <td>{{ get_commands(sudorule.sudo_command) }}</td>
+      <td>{{ get_hosts(sudorule.sudo_host) }}</td>
       <td>{{ sudorule.guidhex }}</td>
       <td>
         <button type="button" class="btn btn-warning mr">

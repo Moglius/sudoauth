@@ -46,4 +46,13 @@ export class ShowRemSudorulesComponent implements OnInit{
   fetchPrevious() {
     this.refreshSudorulesList(this.previous);
   }
+
+  get_commands(commands: any){
+    return commands.map((obj: { full_command: string; }) => obj.full_command).join(', ')
+  }
+
+  get_hosts(hosts: any){
+    return hosts.map((obj: { hostname: string; }) => obj.hostname).join(', ')
+  }
+
 }
