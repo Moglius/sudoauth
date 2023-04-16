@@ -1,13 +1,36 @@
-<nav aria-label="Page navigation">
-  <ul class="pagination justify-content-end">
-    <li class="page-item" [ngClass]="{disabled: previous === ''}">
-      <button  class="page-link" (click)="fetchPrevious()">Previous</button>
-    </li>
-    <li class="page-item" [ngClass]="{disabled: next === ''}">
-      <button class="page-link" (click)="fetchNext()">Next</button>
-    </li>
-  </ul>
-</nav>
+<div class="container">
+  <div class="row">
+    <div class="col-8 justify-content-md-start">
+      <ul class="pagination">
+        <li>
+          <div class="page-item">
+            <button type="button" class="btn btn-primary"
+            data-bs-toggle="modal" data-bs-target="#exampleModal"
+          (click)="addClick()" data-backdrop="static" data-keyboard="false">{{ addButtonText }}</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="col-4 justify-content-end">
+      <nav aria-label="Page navigation">
+        <ul class="pagination ">
+          <li>
+            <div class="page-item">
+              <input [(ngModel)]="hostsFilter" class="form-control"
+              (keyup)="FilterFn()" placeholder="Filter hosts">
+            </div>
+          </li>
+          <li class="page-item" [ngClass]="{disabled: previous === ''}">
+            <button  class="page-link" (click)="fetchPrevious()">Previous</button>
+          </li>
+          <li class="page-item" [ngClass]="{disabled: next === ''}">
+            <button class="page-link" (click)="fetchNext()">Next</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -21,13 +44,34 @@
       <td>{{ host.pk }}</td>
       <td>{{ host.hostname }}</td>
       <td>
-        <button type="button" class="btn btn-warning mr">
-          Edit
-        </button>
-        <button type="button" class="btn btn-danger mr-1">
-          Remove
-        </button>
+        <button type="button" class="btn btn-info"
+          data-bs-toggle="modal" data-bs-target="#exampleModal"
+          (click)="editClick(host)" data-backdrop="static" data-keyboard="false">
+            Edit
+          </button>
+          <button type="button" class="btn btn-danger" (click)="deleteClick(host)">
+            Delete
+          </button>
       </td>
     </tr>
   </tbody>
 </table>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">{{ modalTitle }}</h1>
+        <button type="button" class="btn-close"
+        data-bs-dismiss="modal" aria-label="Close" (click)="closeClick()" (closeChild)="closeClick()"></button>
+
+      </div>
+      <div class="modal-body">
+        <app-add-edit-host [hosts_dep]='hosts_dep'
+        *ngIf="activateAddEditComponent" (closeChild)="activateAddEditComponent = false" (closeChild)="closeClick()"></app-add-edit-host>
+        <div ></div>
+      </div>
+    </div>
+  </div>
+</div>
