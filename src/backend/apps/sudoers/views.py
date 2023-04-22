@@ -2,10 +2,79 @@ from rest_framework import viewsets
 
 from apps.ldapconn.models import LDAPSudoRule
 from apps.ldapconn.ldap import LDAPObjectsService
-from .models import SudoRule, SudoCommand, SudoHost
+from .models import (SudoRule, SudoCommand, SudoHost,
+    SudoCommandRole, SudoHostGroup)
 from .serializers import (SudoRuleListDetailSerializer,
     SudoRulePutPatchSerializer, SudoRuleCreateSerializer,
-    SudoCommandSerializer, SudoHostSerializer)
+    SudoCommandSerializer, SudoHostSerializer,
+    SudoCommandRoleListDetailSerializer, SudoCommandRolePutPatchSerializer,
+    SudoCommandRoleCreateSerializer, SudoHostGroupListDetailSerializer,
+    SudoHostGroupPutPatchSerializer, SudoHostGroupCreateSerializer)
+
+
+class SudoCommandRoleViewSet(viewsets.ModelViewSet):
+    queryset = SudoCommandRole.objects.all()
+
+    action_serializer_classes = {
+        'list': SudoCommandRoleListDetailSerializer, 
+        'retrieve': SudoCommandRoleListDetailSerializer,
+        'update': SudoCommandRolePutPatchSerializer,
+        'partial_update': SudoCommandRolePutPatchSerializer,
+        'create': SudoCommandRoleCreateSerializer
+    }
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+    def get_serializer_class(self):
+        try:
+            return self.action_serializer_classes[self.action]
+        except (KeyError, AttributeError):
+            return super(SudoCommandRoleViewSet, self).get_serializer_class()
+
+    def destroy(self, request, *args, **kwargs):
+        # TODO: removed from any sudorule where is used
+        return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        # TODO: update from any sudorule where is used
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        # TODO: update from any sudorule where is used
+        return super().partial_update(request, *args, **kwargs)
+
+
+class SudoHostGroupRoleViewSet(viewsets.ModelViewSet):
+    queryset = SudoHostGroup.objects.all()
+    action_serializer_classes = {
+        'list': SudoHostGroupListDetailSerializer, 
+        'retrieve': SudoHostGroupListDetailSerializer,
+        'update': SudoHostGroupPutPatchSerializer,
+        'partial_update': SudoHostGroupPutPatchSerializer,
+        'create': SudoHostGroupCreateSerializer
+    }
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+    def get_serializer_class(self):
+        try:
+            return self.action_serializer_classes[self.action]
+        except (KeyError, AttributeError):
+            return super(SudoHostGroupRoleViewSet, self).get_serializer_class()
+
+    def destroy(self, request, *args, **kwargs):
+        # TODO: removed from any sudorule where is used
+        return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        # TODO: update from any sudorule where is used
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        # TODO: update from any sudorule where is used
+        return super().partial_update(request, *args, **kwargs)
 
 
 class SudoHostViewSet(viewsets.ModelViewSet):

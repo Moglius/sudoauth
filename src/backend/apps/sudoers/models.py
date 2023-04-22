@@ -72,6 +72,9 @@ class SudoCommandRole(models.Model):
     def __str__(self):
         return self.name
 
+    def get_ldap_value(self):
+        return [command.get_ldap_value() for command in self.commands.all()]
+
 
 class SudoRule(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -83,12 +86,7 @@ class SudoRule(models.Model):
     sudo_host_groups = models.ManyToManyField(SudoHostGroup)
 
     sudo_command = models.ManyToManyField(SudoCommand)
-    sudo_command_role = models.ForeignKey(
-        SudoCommandRole,
-        on_delete=models.CASCADE
-    )
-
-    models.ManyToManyField(SudoCommandRole)
+    sudo_command_role = models.ManyToManyField(SudoCommandRole)
 
     run_as_user = models.ForeignKey(
         'lnxusers.LnxUser',
@@ -139,8 +137,8 @@ class SudoRule(models.Model):
     def get_ldap_command_list(self):
         commands = set()
         commands.update([command.get_ldap_value() for command in self.sudo_command.all()])
-        for command in self.sudo_command_role.commands.all():
-            commands.add(command.get_ldap_value())
+        for command_role in self.sudo_command_role.all():
+            commands.update(command_role.get_ldap_value())
         return list(commands)
 
     def get_ldap_host_list(self):

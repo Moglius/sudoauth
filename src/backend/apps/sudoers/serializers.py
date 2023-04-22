@@ -23,12 +23,28 @@ class SudoHostSerializer(serializers.ModelSerializer):
         fields = ['pk', 'hostname']
 
 
-class SudoHostGroupSerializer(serializers.ModelSerializer):
+class SudoHostGroupListDetailSerializer(serializers.ModelSerializer):
     servers = SudoHostSerializer(many=True)
 
     class Meta:
         model = SudoHostGroup
-        fields = ['pk', 'name', 'servers']
+        fields = '__all__'
+
+
+class SudoHostGroupPutPatchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SudoHostGroup
+        fields = '__all__'
+        extra_kwargs = {
+            'name': {'read_only': True},
+        }
+
+
+class SudoHostGroupCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SudoHostGroup
+        fields = '__all__'
 
 
 class SudoCommandSerializer(serializers.ModelSerializer):
@@ -37,21 +53,39 @@ class SudoCommandSerializer(serializers.ModelSerializer):
         fields = ['pk', 'command', 'args', 'diggest', 'full_command']
 
 
-class SudoCommandRoleSerializer(serializers.ModelSerializer):
+class SudoCommandRoleListDetailSerializer(serializers.ModelSerializer):
     commands = SudoCommandSerializer(many=True)
 
     class Meta:
         model = SudoCommandRole
-        fields = ['pk', 'name', 'commands']
+        fields = '__all__'
+
+
+class SudoCommandRolePutPatchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SudoCommandRole
+        fields = '__all__'
+        extra_kwargs = {
+            'name': {'read_only': True},
+        }
+
+
+class SudoCommandRoleCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SudoCommandRole
+        fields = '__all__'
+
 
 
 class SudoRuleListDetailSerializer(serializers.ModelSerializer):
     sudo_user_users = SudoUserSerializer(many=True)
     sudo_user_groups = SudoGroupSerializer(many=True)
     sudo_host_servers = SudoHostSerializer(many=True)
-    sudo_host_groups = SudoHostGroupSerializer(many=True)
+    sudo_host_groups = SudoHostGroupListDetailSerializer(many=True)
     sudo_command = SudoCommandSerializer(many=True)
-    sudo_command_role = SudoCommandRoleSerializer()
+    sudo_command_role = SudoCommandRoleListDetailSerializer(many=True)
     run_as_user = SudoUserSerializer()
     run_as_group = SudoGroupSerializer()
 
