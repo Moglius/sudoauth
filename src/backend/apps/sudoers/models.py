@@ -111,6 +111,16 @@ class SudoRule(models.Model):
     def __str__(self):
         return self.name
 
+    def set_default_runas_group(self, lnxgroup, default_group):
+        if self.run_as_group == lnxgroup:
+            self.run_as_group = default_group
+            self.save()
+
+    def set_default_runas_user(self, lnxuser, default_user):
+        if self.run_as_user == lnxuser:
+            self.run_as_user = default_user
+            self.save()
+
     def get_ldap_name(self):
         return self.name.encode('utf-8')
 

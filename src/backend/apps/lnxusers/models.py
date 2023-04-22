@@ -63,6 +63,11 @@ class LnxGroup(models.Model):
     def get_attached_lnxusers(self):
         return self.lnxuser_set.all()
 
+    def get_attached_sudorules(self):
+        sudorules = list(self.sudorule_set.all())
+        sudorules.extend(list(self.sudorule_runasgroup_set.all()))
+        return sudorules
+
 
 class LnxUser(models.Model):
     username = models.CharField(max_length=50, unique=True,
@@ -120,3 +125,8 @@ class LnxUser(models.Model):
 
     def get_ldap_shell(self):
         return self.login_shell.shell.encode('utf-8')
+
+    def get_attached_sudorules(self):
+        sudorules = list(self.sudorule_set.all())
+        sudorules.extend(list(self.sudorule_runasuser_set.all()))
+        return sudorules

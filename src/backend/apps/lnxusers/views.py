@@ -58,9 +58,15 @@ class LnxGroupViewSet(viewsets.ModelViewSet):
             LDAPUser.update_lnxuser(lnxuser)
         return default_group
 
-    def _remove_sudouser_from_sudorules(self, sudorules):
+    def _remove_lnxgroup_from_sudorules(self, sudorules):
         for sudo_rule in sudorules:
             LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        return sudorules
+
+    def _set_sudorule_default_runas(self, sudorules, lnxgroup):
+        default_group = LnxGroup.objects.filter(groupname='root').first()
+        for sudo_rule in sudorules:
+            sudo_rule.set_default_runas_group(lnxgroup, default_group)
         return sudorules
 
     def destroy(self, request, *args, **kwargs):
@@ -68,12 +74,12 @@ class LnxGroupViewSet(viewsets.ModelViewSet):
         if lnxgroup.is_default_group():
             raise ValidationError('This group is seleted as default in your config.'\
                                   'Can not be deleted.')
+        sudorules = lnxgroup.get_attached_sudorules()
         self._set_lnxuser_default_group(lnxgroup)
-        sudorules = lnxgroup.related_group.get_attached_sudorules()
+        self._set_sudorule_default_runas(sudorules, lnxgroup)
         LDAPGroup.clear_lnxgroup(lnxgroup)
         response = super().destroy(request, *args, **kwargs)
-        lnxgroup.related_group.delete()
-        self._remove_sudouser_from_sudorules(sudorules)
+        self._remove_lnxgroup_from_sudorules(sudorules)
         return response
 
     def partial_update(self, request, *args, **kwargs):
@@ -109,18 +115,25 @@ class LnxUserViewSet(viewsets.ModelViewSet):
         except (KeyError, AttributeError):
             return super(LnxUserViewSet, self).get_serializer_class()
 
-    def _remove_lnxuser_from_sudorules(self, sudo_user):
-        sudo_rules = sudo_user.get_attached_sudorules()
-        sudo_user.delete()
+    def _remove_lnxuser_from_sudorules(self, sudo_rules):
         for sudo_rule in sudo_rules:
             LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
         return sudo_rules
 
+    def _set_sudorule_default_runas(self, sudorules, lnxuser):
+        default_user = LnxUser.objects.filter(username='root').first()
+        for sudo_rule in sudorules:
+            sudo_rule.set_default_runas_user(lnxuser, default_user)
+        return sudorules
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        self._remove_lnxuser_from_sudorules(instance.related_user)
+        sudo_rules = instance.get_attached_sudorules()
+        self._set_sudorule_default_runas(sudo_rules, instance)
         LDAPUser.clear_lnxuser(instance)
-        return super().destroy(request, *args, **kwargs)
+        response = super().destroy(request, *args, **kwargs)
+        self._remove_lnxuser_from_sudorules(sudo_rules)
+        return response
 
     def partial_update(self, request, *args, **kwargs):
         response = super().partial_update(request, *args, **kwargs)
