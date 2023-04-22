@@ -3,7 +3,6 @@ from rest_framework.serializers import ValidationError
 
 from apps.ldapconn.models import (LDAPUser, LDAPGroup,
     LDAPSudoRule)
-from apps.sudoers.models import SudoUser
 from apps.ldapconfig.models import LDAPConfig
 from .models import LnxShell, LnxGroup, LnxUser
 from .serializers import (LnxGroupSerializer, LnxShellSerializer,
@@ -110,7 +109,7 @@ class LnxUserViewSet(viewsets.ModelViewSet):
         except (KeyError, AttributeError):
             return super(LnxUserViewSet, self).get_serializer_class()
 
-    def _remove_lnxuser_from_sudorules(self, sudo_user: SudoUser):
+    def _remove_lnxuser_from_sudorules(self, sudo_user):
         sudo_rules = sudo_user.get_attached_sudorules()
         sudo_user.delete()
         for sudo_rule in sudo_rules:

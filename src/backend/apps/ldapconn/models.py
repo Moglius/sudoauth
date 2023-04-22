@@ -432,6 +432,8 @@ class LDAPSudoRule:
         except ldap.NO_SUCH_OBJECT:
             attrs = cls._create_ldap_add_attrs(sudo_rule)
             ldif = modlist.addModlist(attrs)
+            print(ldif)
+            print(dn)
             connection.add_s(dn, ldif)
         cls._save_guid_on_entry(dn, connection, sudo_rule)
 

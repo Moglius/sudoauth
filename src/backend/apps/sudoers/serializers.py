@@ -1,13 +1,20 @@
 from rest_framework import serializers
 
-from .models import (SudoRule, SudoUser,
-    SudoHost, SudoCommand)
+from apps.lnxusers.models import LnxGroup, LnxUser
+from .models import (SudoRule, SudoHost, SudoCommand,
+    SudoCommandRole, SudoHostGroup)
 
 
 class SudoUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SudoUser
+        model = LnxUser
         fields = ['pk', 'username']
+
+
+class SudoGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LnxGroup
+        fields = ['pk', 'groupname']
 
 
 class SudoHostSerializer(serializers.ModelSerializer):
@@ -16,18 +23,37 @@ class SudoHostSerializer(serializers.ModelSerializer):
         fields = ['pk', 'hostname']
 
 
+class SudoHostGroupSerializer(serializers.ModelSerializer):
+    servers = SudoHostSerializer(many=True)
+
+    class Meta:
+        model = SudoHostGroup
+        fields = ['pk', 'name', 'servers']
+
+
 class SudoCommandSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoCommand
         fields = ['pk', 'command', 'args', 'diggest', 'full_command']
 
 
+class SudoCommandRoleSerializer(serializers.ModelSerializer):
+    commands = SudoCommandSerializer(many=True)
+
+    class Meta:
+        model = SudoCommandRole
+        fields = ['pk', 'name', 'commands']
+
+
 class SudoRuleListDetailSerializer(serializers.ModelSerializer):
-    sudo_user = SudoUserSerializer(many=True)
-    sudo_host = SudoHostSerializer(many=True)
+    sudo_user_users = SudoUserSerializer(many=True)
+    sudo_user_groups = SudoGroupSerializer(many=True)
+    sudo_host_servers = SudoHostSerializer(many=True)
+    sudo_host_groups = SudoHostGroupSerializer(many=True)
     sudo_command = SudoCommandSerializer(many=True)
+    sudo_command_role = SudoCommandRoleSerializer()
     run_as_user = SudoUserSerializer()
-    run_as_group = SudoUserSerializer()
+    run_as_group = SudoGroupSerializer()
 
     class Meta:
         model = SudoRule

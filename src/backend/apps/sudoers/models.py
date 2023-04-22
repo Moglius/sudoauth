@@ -4,30 +4,6 @@ from helpers.validators.model_validators import (validate_hostname,
     validate_path)
 
 
-class SudoUser(models.Model):
-    ''' https://www.sudo.ws/docs/man/1.8.17/sudoers.ldap.man/#sudoUser
-    '''
-    username = models.CharField(max_length=65, unique=True)
-    built_in = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.username
-
-    @classmethod
-    def get_instance(cls, username):
-        return cls.objects.get(username=username['username'])
-
-    @classmethod
-    def get_instances(cls, sudo_users) -> list:
-        return_list = []
-        for sudo_user in sudo_users:
-            return_list.append(cls.objects.get(username=sudo_user['username']))
-        return return_list
-
-    def get_attached_sudorules(self):
-        return list(self.sudorule_set.all())
-
-
 class SudoHost(models.Model):
 
     hostname = models.CharField(max_length=253, unique=True,
@@ -42,6 +18,21 @@ class SudoHost(models.Model):
         for sudo_host in sudo_hosts:
             return_list.append(cls.objects.get(hostname=sudo_host['hostname']))
         return return_list
+
+    def get_ldap_value(self):
+        return self.hostname.encode()
+
+
+class SudoHostGroup(models.Model):
+
+    name = models.CharField(max_length=50, unique=True)
+    servers = models.ManyToManyField(SudoHost)
+
+    def __str__(self):
+        return self.name
+
+    def get_ldap_value(self):
+        return f"+{self.name}".encode()
 
 
 class SudoCommand(models.Model):
@@ -69,19 +60,43 @@ class SudoCommand(models.Model):
             return_list.append(cls.objects.get(command=sudo_command['command']))
         return return_list
 
+    def get_ldap_value(self):
+        return self.full_command.encode()
+
+
+class SudoCommandRole(models.Model):
+
+    name = models.CharField(max_length=50, unique=True)
+    commands = models.ManyToManyField(SudoCommand)
+
+    def __str__(self):
+        return self.name
+
 
 class SudoRule(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    sudo_user = models.ManyToManyField(SudoUser)
-    sudo_host = models.ManyToManyField(SudoHost)
+
+    sudo_user_users = models.ManyToManyField('lnxusers.LnxUser')
+    sudo_user_groups = models.ManyToManyField('lnxusers.LnxGroup')
+
+    sudo_host_servers = models.ManyToManyField(SudoHost)
+    sudo_host_groups = models.ManyToManyField(SudoHostGroup)
+
     sudo_command = models.ManyToManyField(SudoCommand)
+    sudo_command_role = models.ForeignKey(
+        SudoCommandRole,
+        on_delete=models.CASCADE
+    )
+
+    models.ManyToManyField(SudoCommandRole)
+
     run_as_user = models.ForeignKey(
-        SudoUser,
+        'lnxusers.LnxUser',
         related_name='sudorule_runasuser_set',
         on_delete=models.CASCADE
     )
     run_as_group = models.ForeignKey(
-        SudoUser,
+        'lnxusers.LnxGroup',
         related_name='sudorule_runasgroup_set',
         on_delete=models.CASCADE
     )
@@ -100,19 +115,29 @@ class SudoRule(models.Model):
         return self.name.encode('utf-8')
 
     def get_ldap_run_as_user(self):
-        return self.run_as_user.username.encode('utf-8')
+        return self.run_as_user.get_ldap_username()
 
     def get_ldap_run_as_group(self):
-        return self.run_as_group.username.encode('utf-8')
+        return self.run_as_group.get_ldap_run_as_group()
 
     def get_ldap_sudouser_list(self):
-        return [user.username.encode('utf-8') for user in self.sudo_user.all()]
+        sudo_users = [user.get_ldap_username() for user in self.sudo_user_users.all()]
+        for group in self.sudo_user_groups.all():
+            sudo_users.append(group.get_ldap_groupname())
+        return sudo_users
 
     def get_ldap_command_list(self):
-        return [command.full_command.encode('utf-8') for command in self.sudo_command.all()]
+        commands = set()
+        commands.update([command.get_ldap_value() for command in self.sudo_command.all()])
+        for command in self.sudo_command_role.commands.all():
+            commands.add(command.get_ldap_value())
+        return list(commands)
 
     def get_ldap_host_list(self):
-        return [host.hostname.encode('utf-8') for host in self.sudo_host.all()]
+        hosts = [host.get_ldap_value() for host in self.sudo_host_servers.all()]
+        for host_group in self.sudo_host_groups.all():
+            hosts.append(host_group.get_ldap_value())
+        return hosts
 
     def get_ldap_not_after(self):
         if self.sudo_not_after:

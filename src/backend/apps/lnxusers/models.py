@@ -36,25 +36,17 @@ class LnxGroup(models.Model):
     gid_number = models.BigIntegerField(unique=True)
     guidhex = models.CharField(max_length=60)
 
-    related_group = models.ForeignKey(
-        'sudoers.SudoUser',
-        on_delete=models.CASCADE
-    )
-
     def __str__(self):
         return self.groupname
 
     def get_sudo_user_name(self):
         return f"%{self.groupname}"
 
-    def set_sudo_user(self):
-        sudo_user = apps.get_model('sudoers.SudoUser')
-        self.related_group = sudo_user.objects.get_or_create(
-            username=self.get_sudo_user_name())[0]
+    def get_ldap_groupname(self):
+        return self.get_sudo_user_name().encode()
 
-    def set_sudo_user_name(self):
-        self.related_group.username = self.get_sudo_user_name()
-        self.related_group.save()
+    def get_ldap_run_as_group(self):
+        return self.groupname.encode()
 
     def get_gid_number(self):
         return str(self.gid_number)
@@ -88,10 +80,6 @@ class LnxUser(models.Model):
         validators=[validate_path])
     gecos = models.CharField(max_length=64)
 
-    related_user = models.ForeignKey(
-        'sudoers.SudoUser',
-        on_delete=models.CASCADE
-    )
     guidhex = models.CharField(max_length=60)
 
     def __str__(self):
@@ -102,15 +90,6 @@ class LnxUser(models.Model):
 
     def get_guid(self):
         return self.guidhex
-
-    def set_sudo_user(self):
-        sudo_user = apps.get_model('sudoers.SudoUser')
-        self.related_user = sudo_user.objects.create(
-            username=self.get_sudo_user_name())
-
-    def set_sudo_user_name(self):
-        self.related_user.username = self.get_sudo_user_name()
-        self.related_user.save()
 
     def set_shell(self, shell):
         self.login_shell = shell
@@ -123,6 +102,9 @@ class LnxUser(models.Model):
     def save(self, *args, **kwargs):
         self.home_dir = path.normpath(self.home_dir)
         super(LnxUser, self).save(*args, **kwargs)
+
+    def get_ldap_username(self):
+        return self.username.encode()
 
     def get_ldap_gid(self):
         return str(self.primary_group.gid_number).encode('utf-8')
