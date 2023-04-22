@@ -47,12 +47,16 @@ export class ShowRemSudorulesComponent implements OnInit{
     this.refreshSudorulesList(this.previous);
   }
 
-  get_commands(commands: any){
-    return commands.map((obj: { full_command: string; }) => obj.full_command).join(', ')
+  get_commands(sudorule: any){
+    let bare_commands = sudorule.sudo_command.map((obj: { full_command: string; }) => obj.full_command);
+    let roles = sudorule.sudo_command_role.map((obj: { name: string; }) => `+${obj.name}`);
+    return bare_commands.concat(roles).join(', ');
   }
 
-  get_hosts(hosts: any){
-    return hosts.map((obj: { hostname: string; }) => obj.hostname).join(', ')
+  get_hosts(sudorule: any){
+    let servers = sudorule.sudo_host_servers.map((obj: { hostname: string; }) => obj.hostname);
+    let groups = sudorule.sudo_host_groups.map((obj: { name: string; }) => `+${obj.name}`);
+    return servers.concat(groups).join(', ');
   }
 
 }
