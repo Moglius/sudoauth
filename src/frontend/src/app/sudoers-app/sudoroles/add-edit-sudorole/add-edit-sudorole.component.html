@@ -1,0 +1,15 @@
+<div *ngIf="putFrom" class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">ID</span>
+  <input type="text" class="form-control" placeholder="id" disabled
+  aria-label="id" aria-describedby="basic-addon1" [ngModel]="role.pk">
+</div>
+
+<div *ngIf="putFrom" class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">name</span>
+  <input type="text" class="form-control" placeholder="name" disabled
+  aria-label="name" aria-describedby="basic-addon1" [(ngModel)]="role.name">
+</div>
+
+<div>
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeClick()">Close</button>
+</div>
