@@ -20,6 +20,8 @@ class LDAPHelper:
         'sudoHost',
         'sudoOption',
         'sudoUser',
+        'nisNetgroupTriple',
+        'memberNisNetgroup'
     )
 
     def _get_ldap_values(self, attrs_val, key):
@@ -454,3 +456,96 @@ class LDAPSudoRule:
     def apply_filter(self, filter_str):
         return (filter_str in self.name or
             any(filter_str in word for word in self.sudoCommand))
+
+
+class LDAPNisNetgroup:
+
+    def __init__(self, dn, attrs):
+        self.helper = LDAPHelper()
+        self.distinguishedName = dn
+        self.name = self.helper.get_attributes(attrs, 'name')
+        self.cn = self.helper.get_attributes(attrs, 'cn')
+        self.description = self.helper.get_attributes(attrs, 'description')
+        self.nisNetgroupTriple = self.helper.get_attributes(attrs, 'nisNetgroupTriple')
+        self.memberNisNetgroup = self.helper.get_attributes(attrs, 'memberNisNetgroup')
+        self.objectGUID = self.helper.get_guid(attrs, 'objectGUID')
+        self.objectGUIDHex = self.helper.get_guid_hex(attrs, 'objectGUID')
+
+
+    @classmethod
+    def get_objectclass_filter(cls, guid=None):
+        if guid:
+            return f"(&(objectClass=nisNetgroup)(objectGUID={guid}))"
+        return "(objectClass=nisNetgroup)"
+
+    @classmethod
+    def get_attributes_list(cls):
+        return ['distinguishedName', 'name', 'cn', 'description',
+            'nisNetgroupTriple', 'memberNisNetgroup', 'objectGUID']
+
+    @classmethod
+    def get_dn_to_search(cls, ldap_config):
+        return ldap_config.get_nis_netgroup_base_dns()
+
+    @classmethod
+    def create_or_update_nis_netgroup(cls, nis_netgroup):
+        ldap_service = LDAPObjectsService(LDAPNisNetgroup)
+        ldap_service.create_object_by_intance(nis_netgroup)
+        return nis_netgroup
+
+    @classmethod
+    def _create_ldap_mod_attrs(cls, nis_netgroup):
+        return [
+            ( ldap.MOD_REPLACE, "nisNetgroupTriple", nis_netgroup.get_ldap_nis_triple()),
+            ( ldap.MOD_REPLACE, "memberNisNetgroup", nis_netgroup.get_ldap_nis_member())
+        ]
+
+    @classmethod
+    def _create_ldap_add_attrs(cls, nis_netgroup):
+        attrs = {}
+        attrs['objectclass'] = [b'top', b'nisNetgroup']
+        attrs['cn'] = nis_netgroup.get_ldap_name()
+        attrs['name'] = nis_netgroup.get_ldap_name()
+        attrs['nisNetgroupTriple'] = nis_netgroup.get_ldap_nis_triple()
+        attrs['memberNisNetgroup'] = nis_netgroup.get_ldap_nis_member()
+        return attrs
+
+    @classmethod
+    def _save_guid_on_entry(cls, dn, connection, nis_netgroup):
+        new_attrs = connection.search_s(base=dn, scope=ldap.SCOPE_BASE,
+            filterstr=cls.get_objectclass_filter(), attrlist=['*'])[0][1]
+        helper = LDAPHelper()
+        guidhex = helper.get_guid_hex(new_attrs, 'objectGUID')
+        nis_netgroup.guidhex = guidhex
+        nis_netgroup.save()
+
+    @classmethod
+    def _create_ldap_entry(cls, connection, base_dn, attrs, nis_netgroup):
+        dn = f"cn={nis_netgroup.name},{base_dn[0]}"
+        try:
+            connection.modify_s(dn, attrs)
+        except ldap.NO_SUCH_OBJECT:
+            attrs = cls._create_ldap_add_attrs(nis_netgroup)
+            ldif = modlist.addModlist(attrs)
+            connection.add_s(dn, ldif)
+        cls._save_guid_on_entry(dn, connection, nis_netgroup)
+
+    @classmethod
+    def perform_create(cls, connection, base_dn, nis_netgroup):
+        attrs = cls._create_ldap_mod_attrs(nis_netgroup)
+        cls._create_ldap_entry(connection, base_dn, attrs, nis_netgroup)
+        return nis_netgroup
+
+    @classmethod
+    def get_object_by_guid(cls, guid):
+        ldap_service = LDAPObjectsService(LDAPNisNetgroup)
+        return ldap_service.get_object(guid)
+
+    @classmethod
+    def get_objects_list(cls):
+        ldap_service = LDAPObjectsService(LDAPNisNetgroup)
+        return list(ldap_service.get_objects())
+
+    def apply_filter(self, filter_str):
+        return (filter_str in self.name or
+            any(filter_str in word for word in self.nisNetgroupTriple))

@@ -55,6 +55,21 @@ class LDAPSudoRuleSerializer(serializers.Serializer):
     objectGUIDHex = serializers.CharField(max_length=255)
 
 
+class LDAPNisNetgroupSerializer(serializers.Serializer):
+    distinguishedName = serializers.CharField(max_length=255)
+    name = serializers.CharField(max_length=255)
+    cn = serializers.CharField(max_length=255)
+    description = serializers.CharField(max_length=255)
+    nisNetgroupTriple = serializers.ListField(
+        child=serializers.CharField(max_length=255)
+    )
+    memberNisNetgroup = serializers.ListField(
+        child=serializers.CharField(max_length=255)
+    )
+    objectGUID = serializers.CharField(max_length=255)
+    objectGUIDHex = serializers.CharField(max_length=255)
+
+
 class LDAPUserGroupCreationSerializer(serializers.Serializer):
     objectGUIDHex = serializers.CharField(max_length=255)
 

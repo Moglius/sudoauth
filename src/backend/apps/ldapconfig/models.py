@@ -66,6 +66,11 @@ class LDAPConfig(models.Model):
         related_name='sudo_config_set',
         on_delete=models.CASCADE
     )
+    nis_netgroup_dn = models.ForeignKey(
+        LDAPDn,
+        related_name='nis_netgroup_config_set',
+        on_delete=models.CASCADE
+    )
     users_pool = models.ForeignKey(
         PoolRange,
         default=1,
@@ -115,6 +120,9 @@ class LDAPConfig(models.Model):
 
     def get_sudo_base_dns(self):
         return [self.sudo_dn]
+
+    def get_nis_netgroup_base_dns(self):
+        return [self.nis_netgroup_dn]
 
     def get_user_min(self):
         return self.users_pool.pool_min

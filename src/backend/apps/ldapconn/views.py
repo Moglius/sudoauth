@@ -2,8 +2,8 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 
 from .serializers import (LDAPUserSerializer, LDAPGroupSerializer,
-    LDAPUserGroupCreationSerializer, LDAPSudoRuleSerializer)
-from .models import LDAPUser, LDAPGroup, LDAPSudoRule
+    LDAPUserGroupCreationSerializer, LDAPSudoRuleSerializer, LDAPNisNetgroupSerializer)
+from .models import LDAPUser, LDAPGroup, LDAPSudoRule, LDAPNisNetgroup
 
 
 class LDAPViewSet(mixins.ListModelMixin,
@@ -107,4 +107,22 @@ class LDAPSudoRuleViewSet(LDAPViewSet):
     def retrieve(self, request, *args, pk=None, **kwargs):
         sudorule = LDAPSudoRule.get_object_by_guid(pk)
         serializer = LDAPSudoRuleSerializer(sudorule)
+        return Response(serializer.data)
+
+
+class LDAPNisNetgroupViewSet(LDAPViewSet):
+
+    serializer_class = LDAPNisNetgroupSerializer
+    http_method_names = ['get', 'head']
+
+    def get_queryset(self):
+        rules = LDAPNisNetgroup.get_objects_list()
+        name = self.request.query_params.get('name')
+        if name:
+            return [rule for rule in rules if rule.apply_filter(name)]
+        return rules
+
+    def retrieve(self, request, *args, pk=None, **kwargs):
+        nis_netgroup = LDAPNisNetgroup.get_object_by_guid(pk)
+        serializer = LDAPNisNetgroupSerializer(nis_netgroup)
         return Response(serializer.data)

@@ -27,12 +27,24 @@ class SudoHostGroup(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
     servers = models.ManyToManyField(SudoHost)
+    nested = models.ManyToManyField('self', symmetrical=False,
+        related_name='parents', blank=True)
+    guidhex = models.CharField(max_length=60, editable=False)
 
     def __str__(self):
         return self.name
 
     def get_ldap_value(self):
         return f"+{self.name}".encode()
+
+    def get_ldap_name(self):
+        return self.name.encode()
+
+    def get_ldap_nis_triple(self):
+        return [f"({server.hostname},,)".encode() for server in self.servers.all()]
+
+    def get_ldap_nis_member(self):
+        return [hostgroup.get_ldap_name() for hostgroup in self.nested.all()]
 
 
 class SudoCommand(models.Model):

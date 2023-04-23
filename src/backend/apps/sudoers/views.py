@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from apps.ldapconn.models import LDAPSudoRule
+from apps.ldapconn.models import LDAPSudoRule, LDAPNisNetgroup
 from apps.ldapconn.ldap import LDAPObjectsService
 from .models import (SudoRule, SudoCommand, SudoHost,
     SudoCommandRole, SudoHostGroup)
@@ -33,19 +33,31 @@ class SudoCommandRoleViewSet(viewsets.ModelViewSet):
             return super(SudoCommandRoleViewSet, self).get_serializer_class()
 
     def destroy(self, request, *args, **kwargs):
-        # TODO: removed from any sudorule where is used
-        return super().destroy(request, *args, **kwargs)
+        sudo_command_role = self.get_object()
+        sudo_rules = list(sudo_command_role.sudorule_set.all())
+        response = super().destroy(request, *args, **kwargs)
+        for sudo_rule in sudo_rules:
+            LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        return response
 
     def update(self, request, *args, **kwargs):
-        # TODO: update from any sudorule where is used
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        sudo_command_role = self.get_object()
+        sudo_rules = sudo_command_role.sudorule_set.all()
+        for sudo_rule in sudo_rules:
+            LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        return response
 
     def partial_update(self, request, *args, **kwargs):
-        # TODO: update from any sudorule where is used
-        return super().partial_update(request, *args, **kwargs)
+        response = super().partial_update(request, *args, **kwargs)
+        sudo_command_role = self.get_object()
+        sudo_rules = sudo_command_role.sudorule_set.all()
+        for sudo_rule in sudo_rules:
+            LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        return response
 
 
-class SudoHostGroupRoleViewSet(viewsets.ModelViewSet):
+class SudoHostGroupViewSet(viewsets.ModelViewSet):
     queryset = SudoHostGroup.objects.all()
     action_serializer_classes = {
         'list': SudoHostGroupListDetailSerializer, 
@@ -62,19 +74,38 @@ class SudoHostGroupRoleViewSet(viewsets.ModelViewSet):
         try:
             return self.action_serializer_classes[self.action]
         except (KeyError, AttributeError):
-            return super(SudoHostGroupRoleViewSet, self).get_serializer_class()
+            return super(SudoHostGroupViewSet, self).get_serializer_class()
 
     def destroy(self, request, *args, **kwargs):
-        # TODO: removed from any sudorule where is used
-        return super().destroy(request, *args, **kwargs)
+        sudo_host_group = self.get_object()
+        sudo_rules = list(sudo_host_group.sudorule_set.all())
+        parents = list(sudo_host_group.parents.all())
+        ldap_service = LDAPObjectsService(LDAPNisNetgroup)
+        ldap_service.destroy_by_instance(sudo_host_group)
+        response = super().destroy(request, *args, **kwargs)
+        for sudo_rule in sudo_rules:
+            LDAPSudoRule.create_or_update_sudo_rule(sudo_rule)
+        for parent in parents:
+            LDAPNisNetgroup.create_or_update_nis_netgroup(parent)
+        return response
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        instance = SudoHostGroup.objects.get(pk=response.data['id'])
+        LDAPNisNetgroup.create_or_update_nis_netgroup(instance)
+        return response
 
     def update(self, request, *args, **kwargs):
-        # TODO: update from any sudorule where is used
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        instance = self.get_object()
+        LDAPNisNetgroup.create_or_update_nis_netgroup(instance)
+        return response
 
     def partial_update(self, request, *args, **kwargs):
-        # TODO: update from any sudorule where is used
-        return super().partial_update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        instance = self.get_object()
+        LDAPNisNetgroup.create_or_update_nis_netgroup(instance)
+        return response
 
 
 class SudoHostViewSet(viewsets.ModelViewSet):
