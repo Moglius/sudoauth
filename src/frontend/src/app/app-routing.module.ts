@@ -12,6 +12,7 @@ import { HostsComponent } from './sudoers-app/hosts/hosts.component';
 import { CommandsComponent } from './sudoers-app/commands/commands.component';
 import { SudorolesComponent } from './sudoers-app/sudoroles/sudoroles.component';
 import { HostgroupsComponent } from './sudoers-app/hostgroups/hostgroups.component';
+import { AddEditSudoroleComponent } from './sudoers-app/sudoroles/add-edit-sudorole/add-edit-sudorole.component';
 
 const routes: Routes = [
   {path: 'lnxusers', component: LnxusersComponent},
@@ -22,6 +23,7 @@ const routes: Routes = [
   {path: 'ldaprules', component: RulesComponent},
   {path: 'sudorules', component: SudorulesComponent},
   {path: 'sudoroles', component: SudorolesComponent},
+  {path: 'sudoroles/create', component: AddEditSudoroleComponent},
   {path: 'commands', component: CommandsComponent},
   {path: 'hosts', component: HostsComponent},
   {path: 'hostgroups', component: HostgroupsComponent},

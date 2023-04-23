@@ -23,14 +23,6 @@ class SudoHostSerializer(serializers.ModelSerializer):
         fields = ['pk', 'hostname']
 
 
-class SudoHostGroupListDetailSerializer(serializers.ModelSerializer):
-    servers = SudoHostSerializer(many=True)
-
-    class Meta:
-        model = SudoHostGroup
-        fields = '__all__'
-
-
 class SudoHostGroupPutPatchSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -47,18 +39,19 @@ class SudoHostGroupCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SudoHostGroupListDetailSerializer(serializers.ModelSerializer):
+    servers = SudoHostSerializer(many=True)
+    nested = SudoHostGroupCreateSerializer(many=True)
+
+    class Meta:
+        model = SudoHostGroup
+        fields = '__all__'
+
+
 class SudoCommandSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoCommand
         fields = ['pk', 'command', 'args', 'diggest', 'full_command']
-
-
-class SudoCommandRoleListDetailSerializer(serializers.ModelSerializer):
-    commands = SudoCommandSerializer(many=True)
-
-    class Meta:
-        model = SudoCommandRole
-        fields = '__all__'
 
 
 class SudoCommandRolePutPatchSerializer(serializers.ModelSerializer):
@@ -77,6 +70,13 @@ class SudoCommandRoleCreateSerializer(serializers.ModelSerializer):
         model = SudoCommandRole
         fields = '__all__'
 
+
+class SudoCommandRoleListDetailSerializer(serializers.ModelSerializer):
+    commands = SudoCommandSerializer(many=True)
+
+    class Meta:
+        model = SudoCommandRole
+        fields = '__all__'
 
 
 class SudoRuleListDetailSerializer(serializers.ModelSerializer):

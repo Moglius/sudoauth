@@ -103,6 +103,6 @@ export class ShowRemHostgroupComponent implements OnInit{
   }
 
   get_nested(hostgroup: any){
-    return hostgroup.nested.map((obj: { id: string; }) => obj.id).join(', ');
+    return hostgroup.nested.map((obj: { name: string; }) => obj.name).join(', ');
   }
 }

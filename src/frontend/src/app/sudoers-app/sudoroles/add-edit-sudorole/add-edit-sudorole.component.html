@@ -1,15 +1,25 @@
-<div *ngIf="putFrom" class="input-group mb-3">
-  <span class="input-group-text" id="basic-addon1">ID</span>
-  <input type="text" class="form-control" placeholder="id" disabled
-  aria-label="id" aria-describedby="basic-addon1" [ngModel]="role.pk">
-</div>
+<div class="row">
 
-<div *ngIf="putFrom" class="input-group mb-3">
-  <span class="input-group-text" id="basic-addon1">name</span>
-  <input type="text" class="form-control" placeholder="name" disabled
-  aria-label="name" aria-describedby="basic-addon1" [(ngModel)]="role.name">
 </div>
-
-<div>
-<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeClick()">Close</button>
+<div class="row mt-5">
+  <div class="col-5">
+    <label for="options">Commands:</label>
+    <select multiple class="form-select" id="commands" [(ngModel)]="selectedCommands">
+      <option *ngFor="let command of commands" [value]="command">{{command.full_command}}</option>
+    </select>
+  </div>
+  <div class="col-2">
+    <div class="d-grid gap-2">
+      <button type="button" class="btn btn-primary" (click)="moveSelectedCommands(commands, selectedCommands)">Add &raquo;</button>
+      <button type="button" class="btn btn-primary" (click)="moveAllCommands()">Add All &raquo;</button>
+      <button type="button" class="btn btn-primary" (click)="moveSelectedCommands(selectedCommands, commands)">&laquo; Remove</button>
+      <button type="button" class="btn btn-primary" (click)="removeAllCommands()">Remove All &raquo;</button>
+    </div>
+  </div>
+  <div class="col-5">
+    <label for="selected-commands">Selected Commands:</label>
+    <select multiple class="form-select" id="selected-commands">
+      <option *ngFor="let command of selectedSelectedCommands" [value]="command">{{command.full_command}}</option>
+    </select>
+  </div>
 </div>

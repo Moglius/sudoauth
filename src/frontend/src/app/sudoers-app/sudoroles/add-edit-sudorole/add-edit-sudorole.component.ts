@@ -10,17 +10,11 @@ export class AddEditSudoroleComponent implements OnInit{
 
   constructor(private service: LnxuserService) {  }
 
-  @Output() closeChild: EventEmitter<any> = new EventEmitter();
+  readonly commandsUrl = 'http://localhost:8000/api/sudoers/commands/';
+  commands: any[] = [];
 
-  @Input() roles_dep: any;
-  readonly url = 'http://localhost:8000/api/sudoers/roles/';
-  role: any;
-  putFrom = false;
-
-  ngOnInit(): void {
-    this.role = this.roles_dep['role'];
-    this.putFrom = this.roles_dep['edit'];
-  }
+  selectedCommands: any[] = [];
+  selectedSelectedCommands: any[] = [];
 
   updateRole(role: any){
   }
@@ -28,8 +22,44 @@ export class AddEditSudoroleComponent implements OnInit{
   addRole(role: any){
   }
 
-  closeClick(){
-    this.closeChild.emit(null);
+  ngOnInit(): void {
+    this.refreshCommandList(this.commandsUrl);
+  }
+
+  refreshCommandList(url: string) {
+    this.service.getLnxUsersList(url).subscribe(data=>{
+      this.commands = data.results;
+    });
+  }
+
+  moveSelectedCommands(sourceCommands: any[], targetCommands: any[]) {
+
+    /*const selectedCommands = [...sourceCommands.filter(option => this.selectedCommands.includes(option))];
+    this.selectedCommands = this.selectedCommands.filter(option => !selectedCommands.includes(option));
+    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...selectedCommands];*/
+
+    console.log(targetCommands);
+    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...targetCommands];
+  }
+
+  moveAllCommands() {
+
+    /*const selectedCommands = [...sourceCommands.filter(option => this.selectedCommands.includes(option))];
+    this.selectedCommands = this.selectedCommands.filter(option => !selectedCommands.includes(option));
+    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...selectedCommands];*/
+
+    this.selectedSelectedCommands = [...this.commands];
+    this.commands = [];
+  }
+
+  removeAllCommands() {
+
+    /*const selectedCommands = [...sourceCommands.filter(option => this.selectedCommands.includes(option))];
+    this.selectedCommands = this.selectedCommands.filter(option => !selectedCommands.includes(option));
+    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...selectedCommands];*/
+
+    this.commands = [...this.selectedSelectedCommands];
+    this.selectedSelectedCommands = [];
   }
 
 }
