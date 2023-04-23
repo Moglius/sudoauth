@@ -34,6 +34,12 @@ import { AddEditHostComponent } from './sudoers-app/hosts/add-edit-host/add-edit
 import { ShowRemHostComponent } from './sudoers-app/hosts/show-rem-host/show-rem-host.component';
 import { ShowRemCommandComponent } from './sudoers-app/commands/show-rem-command/show-rem-command.component';
 import { AddEditCommandComponent } from './sudoers-app/commands/add-edit-command/add-edit-command.component';
+import { SudorolesComponent } from './sudoers-app/sudoroles/sudoroles.component';
+import { ShowRemSudoroleComponent } from './sudoers-app/sudoroles/show-rem-sudorole/show-rem-sudorole.component';
+import { AddEditSudoroleComponent } from './sudoers-app/sudoroles/add-edit-sudorole/add-edit-sudorole.component';
+import { HostgroupsComponent } from './sudoers-app/hostgroups/hostgroups.component';
+import { AddEditHostgroupComponent } from './sudoers-app/hostgroups/add-edit-hostgroup/add-edit-hostgroup.component';
+import { ShowRemHostgroupComponent } from './sudoers-app/hostgroups/show-rem-hostgroup/show-rem-hostgroup.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +70,13 @@ import { AddEditCommandComponent } from './sudoers-app/commands/add-edit-command
     AddEditHostComponent,
     ShowRemHostComponent,
     ShowRemCommandComponent,
-    AddEditCommandComponent
+    AddEditCommandComponent,
+    SudorolesComponent,
+    ShowRemSudoroleComponent,
+    AddEditSudoroleComponent,
+    HostgroupsComponent,
+    AddEditHostgroupComponent,
+    ShowRemHostgroupComponent
   ],
   imports: [
     BrowserModule,

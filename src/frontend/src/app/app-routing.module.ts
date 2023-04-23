@@ -10,6 +10,8 @@ import { RulesComponent } from './ldapconn-app/rules/rules.component';
 import { SudorulesComponent } from './sudoers-app/sudorules/sudorules.component';
 import { HostsComponent } from './sudoers-app/hosts/hosts.component';
 import { CommandsComponent } from './sudoers-app/commands/commands.component';
+import { SudorolesComponent } from './sudoers-app/sudoroles/sudoroles.component';
+import { HostgroupsComponent } from './sudoers-app/hostgroups/hostgroups.component';
 
 const routes: Routes = [
   {path: 'lnxusers', component: LnxusersComponent},
@@ -19,8 +21,10 @@ const routes: Routes = [
   {path: 'ldapgroups', component: LdapgroupsComponent},
   {path: 'ldaprules', component: RulesComponent},
   {path: 'sudorules', component: SudorulesComponent},
-  {path: 'hosts', component: HostsComponent},
+  {path: 'sudoroles', component: SudorolesComponent},
   {path: 'commands', component: CommandsComponent},
+  {path: 'hosts', component: HostsComponent},
+  {path: 'hostgroups', component: HostgroupsComponent},
 ];
 
 @NgModule({
