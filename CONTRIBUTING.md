@@ -10,6 +10,7 @@ pyenv install 3.11
 ## create python virutal env
 
 pyenv virtualenv 3.11 sudoauth-venv
+pyenv virtualenv 3.11 sudoauth-app-venv
 
 ## Activate venv
 
