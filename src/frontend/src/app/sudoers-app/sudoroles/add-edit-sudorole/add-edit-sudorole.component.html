@@ -1,25 +1,24 @@
 <div class="row">
-
-</div>
-<div class="row mt-5">
-  <div class="col-5">
-    <label for="options">Commands:</label>
-    <select multiple class="form-select" id="commands" [(ngModel)]="selectedCommands">
-      <option *ngFor="let command of commands" [value]="command">{{command.full_command}}</option>
-    </select>
-  </div>
-  <div class="col-2">
-    <div class="d-grid gap-2">
-      <button type="button" class="btn btn-primary" (click)="moveSelectedCommands(commands, selectedCommands)">Add &raquo;</button>
-      <button type="button" class="btn btn-primary" (click)="moveAllCommands()">Add All &raquo;</button>
-      <button type="button" class="btn btn-primary" (click)="moveSelectedCommands(selectedCommands, commands)">&laquo; Remove</button>
-      <button type="button" class="btn btn-primary" (click)="removeAllCommands()">Remove All &raquo;</button>
+  <div class="row mt-5">
+    <div class="col-5">
+      <label for="options">Commands:</label>
+      <select multiple class="form-select" id="commands" [(ngModel)]="selectedCommands">
+        <option *ngFor="let command of commands" [value]="command" (dblclick)="moveSelectedCommands(commands)">{{command.full_command}}</option>
+      </select>
     </div>
-  </div>
-  <div class="col-5">
-    <label for="selected-commands">Selected Commands:</label>
-    <select multiple class="form-select" id="selected-commands">
-      <option *ngFor="let command of selectedSelectedCommands" [value]="command">{{command.full_command}}</option>
-    </select>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedCommands(commands)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllCommands()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedCommands(targetCommands)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllCommands()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-commands">Selected Commands:</label>
+      <select multiple class="form-select" id="selected-commands" [(ngModel)]="selectedSelectedCommands">
+        <option *ngFor="let command of targetCommands" [value]="command" (dblclick)="removeSelectedCommands(targetCommands)">{{command.full_command}}</option>
+      </select>
+    </div>
   </div>
 </div>

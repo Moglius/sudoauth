@@ -12,6 +12,7 @@ export class AddEditSudoroleComponent implements OnInit{
 
   readonly commandsUrl = 'http://localhost:8000/api/sudoers/commands/';
   commands: any[] = [];
+  targetCommands: any[] = [];
 
   selectedCommands: any[] = [];
   selectedSelectedCommands: any[] = [];
@@ -32,34 +33,31 @@ export class AddEditSudoroleComponent implements OnInit{
     });
   }
 
-  moveSelectedCommands(sourceCommands: any[], targetCommands: any[]) {
+  moveSelectedCommands(sourceCommands: any[]) {
 
-    /*const selectedCommands = [...sourceCommands.filter(option => this.selectedCommands.includes(option))];
-    this.selectedCommands = this.selectedCommands.filter(option => !selectedCommands.includes(option));
-    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...selectedCommands];*/
+    const selectedCommands = [...sourceCommands.filter(option => this.selectedCommands.includes(option))];
+    this.commands = this.commands.filter( function( el ) {
+      return !selectedCommands.includes( el );
+    });
+    this.targetCommands = [...new Set([...this.targetCommands, ...selectedCommands])];
+  }
 
-    console.log(targetCommands);
-    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...targetCommands];
+  removeSelectedCommands(sourceCommands: any[]) {
+    const selectedCommands = [...sourceCommands.filter(option => this.selectedSelectedCommands.includes(option))];
+    this.targetCommands = this.targetCommands.filter( function( el ) {
+      return !selectedCommands.includes( el );
+    });
+    this.commands = [...new Set([...this.commands, ...selectedCommands])];
   }
 
   moveAllCommands() {
-
-    /*const selectedCommands = [...sourceCommands.filter(option => this.selectedCommands.includes(option))];
-    this.selectedCommands = this.selectedCommands.filter(option => !selectedCommands.includes(option));
-    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...selectedCommands];*/
-
-    this.selectedSelectedCommands = [...this.commands];
+    this.targetCommands = [...new Set([...this.targetCommands, ...this.commands])];
     this.commands = [];
   }
 
   removeAllCommands() {
-
-    /*const selectedCommands = [...sourceCommands.filter(option => this.selectedCommands.includes(option))];
-    this.selectedCommands = this.selectedCommands.filter(option => !selectedCommands.includes(option));
-    this.selectedSelectedCommands = [...this.selectedSelectedCommands, ...selectedCommands];*/
-
-    this.commands = [...this.selectedSelectedCommands];
-    this.selectedSelectedCommands = [];
+    this.commands = [...new Set([...this.commands, ...this.targetCommands])];
+    this.targetCommands = [];
   }
 
 }
