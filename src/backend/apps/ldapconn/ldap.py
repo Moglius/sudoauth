@@ -20,6 +20,7 @@ class LDAPObjectsService:
 
     def _init_connection(self):
         server = self._get_ldap_servers()[0]
+        print(server)
         connect = ldap.initialize(server)
         connect.set_option(ldap.OPT_REFERRALS, 0)
         user, passwd = self._get_credentials()
