@@ -1,42 +1,40 @@
+from apps.lnxusers.models import LnxGroup, LnxUser
 from rest_framework import serializers
 
-from apps.lnxusers.models import LnxGroup, LnxUser
-from .models import (SudoRule, SudoHost, SudoCommand,
-    SudoCommandRole, SudoHostGroup)
+from .models import SudoCommand, SudoCommandRole, SudoHost, SudoHostGroup, SudoRule
 
 
 class SudoUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = LnxUser
-        fields = ['pk', 'username']
+        fields = ["pk", "username"]
 
 
 class SudoGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = LnxGroup
-        fields = ['pk', 'groupname']
+        fields = ["pk", "groupname"]
 
 
 class SudoHostSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoHost
-        fields = ['pk', 'hostname']
+        fields = ["pk", "hostname"]
 
 
 class SudoHostGroupPutPatchSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SudoHostGroup
-        fields = '__all__'
+        fields = "__all__"
         extra_kwargs = {
-            'name': {'read_only': True},
+            "name": {"read_only": True},
         }
 
 
 class SudoHostGroupCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoHostGroup
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SudoHostGroupListDetailSerializer(serializers.ModelSerializer):
@@ -45,30 +43,28 @@ class SudoHostGroupListDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoHostGroup
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SudoCommandSerializer(serializers.ModelSerializer):
     class Meta:
         model = SudoCommand
-        fields = ['pk', 'command', 'args', 'diggest', 'full_command']
+        fields = ["pk", "command", "args", "diggest", "full_command"]
 
 
 class SudoCommandRolePutPatchSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SudoCommandRole
-        fields = '__all__'
+        fields = "__all__"
         extra_kwargs = {
-            'name': {'read_only': True},
+            "name": {"read_only": True},
         }
 
 
 class SudoCommandRoleCreateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SudoCommandRole
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SudoCommandRoleListDetailSerializer(serializers.ModelSerializer):
@@ -76,7 +72,7 @@ class SudoCommandRoleListDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoCommandRole
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SudoRuleListDetailSerializer(serializers.ModelSerializer):
@@ -91,21 +87,19 @@ class SudoRuleListDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SudoRule
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SudoRulePutPatchSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SudoRule
-        fields = '__all__'
+        fields = "__all__"
         extra_kwargs = {
-            'name': {'read_only': True},
+            "name": {"read_only": True},
         }
 
 
 class SudoRuleCreateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SudoRule
-        fields = '__all__'
+        fields = "__all__"

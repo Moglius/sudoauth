@@ -1,8 +1,6 @@
 from django.contrib import admin
 
-from .models import (SudoHost, SudoCommand, SudoRule,
-    SudoCommandRole, SudoHostGroup)
-
+from .models import SudoCommand, SudoCommandRole, SudoHost, SudoHostGroup, SudoRule
 
 # Register your models here.
 admin.site.register(SudoHost)

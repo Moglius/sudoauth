@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('sudoers', '0002_remove_sudorule_sudo_command_role_and_more'),
+        ("sudoers", "0002_remove_sudorule_sudo_command_role_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sudohostgroup',
-            name='nested',
-            field=models.ManyToManyField(to='sudoers.sudohostgroup'),
+            model_name="sudohostgroup",
+            name="nested",
+            field=models.ManyToManyField(to="sudoers.sudohostgroup"),
         ),
     ]

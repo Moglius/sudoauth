@@ -1,12 +1,15 @@
+from apps.ldapconfig.models import LDAPConfig
+from apps.ldapconn.models import LDAPGroup, LDAPSudoRule, LDAPUser
 from rest_framework import viewsets
 from rest_framework.serializers import ValidationError
 
-from apps.ldapconn.models import (LDAPUser, LDAPGroup,
-    LDAPSudoRule)
-from apps.ldapconfig.models import LDAPConfig
-from .models import LnxShell, LnxGroup, LnxUser
-from .serializers import (LnxGroupSerializer, LnxShellSerializer,
-    LnxUserPutPatchSerializer, LnxUserListDetailSerializer)
+from .models import LnxGroup, LnxShell, LnxUser
+from .serializers import (
+    LnxGroupSerializer,
+    LnxShellSerializer,
+    LnxUserListDetailSerializer,
+    LnxUserPutPatchSerializer,
+)
 
 
 class LnxShellViewSet(viewsets.ModelViewSet):
@@ -28,8 +31,10 @@ class LnxShellViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         shell = self.get_object()
         if shell.is_built_in() or shell.is_default_shell():
-            raise ValidationError('This shell is either seleted as default in your config '\
-                                  'or it is an app built-in shell, Can not be deleted.')
+            raise ValidationError(
+                "This shell is either seleted as default in your config "
+                "or it is an app built-in shell, Can not be deleted."
+            )
         self._set_lnxuser_default_shell(shell)
         return super().destroy(request, *args, **kwargs)
 
@@ -49,7 +54,7 @@ class LnxShellViewSet(viewsets.ModelViewSet):
 class LnxGroupViewSet(viewsets.ModelViewSet):
     queryset = LnxGroup.objects.all()
     serializer_class = LnxGroupSerializer
-    http_method_names = ['get', 'delete', 'head', 'put', 'patch']
+    http_method_names = ["get", "delete", "head", "put", "patch"]
 
     def _set_lnxuser_default_group(self, instance: LnxGroup):
         default_group = LDAPConfig.get_default_group()
@@ -64,7 +69,7 @@ class LnxGroupViewSet(viewsets.ModelViewSet):
         return sudorules
 
     def _set_sudorule_default_runas(self, sudorules, lnxgroup):
-        default_group = LnxGroup.objects.filter(groupname='root').first()
+        default_group = LnxGroup.objects.filter(groupname="root").first()
         for sudo_rule in sudorules:
             sudo_rule.set_default_runas_group(lnxgroup, default_group)
         return sudorules
@@ -72,8 +77,9 @@ class LnxGroupViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         lnxgroup = self.get_object()
         if lnxgroup.is_default_group():
-            raise ValidationError('This group is seleted as default in your config.'\
-                                  'Can not be deleted.')
+            raise ValidationError(
+                "This group is seleted as default in your config." "Can not be deleted."
+            )
         sudorules = lnxgroup.get_attached_sudorules()
         self._set_lnxuser_default_group(lnxgroup)
         self._set_sudorule_default_runas(sudorules, lnxgroup)
@@ -97,17 +103,17 @@ class LnxGroupViewSet(viewsets.ModelViewSet):
 
 class LnxUserViewSet(viewsets.ModelViewSet):
     queryset = LnxUser.objects.all()
-    http_method_names = ['get', 'delete', 'head', 'put', 'patch']
+    http_method_names = ["get", "delete", "head", "put", "patch"]
 
     action_serializer_classes = {
-        'list': LnxUserListDetailSerializer, 
-        'retrieve': LnxUserListDetailSerializer,
-        'update': LnxUserPutPatchSerializer,
-        'partial_update': LnxUserPutPatchSerializer
+        "list": LnxUserListDetailSerializer,
+        "retrieve": LnxUserListDetailSerializer,
+        "update": LnxUserPutPatchSerializer,
+        "partial_update": LnxUserPutPatchSerializer,
     }
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def get_serializer_class(self):
         try:
@@ -121,7 +127,7 @@ class LnxUserViewSet(viewsets.ModelViewSet):
         return sudo_rules
 
     def _set_sudorule_default_runas(self, sudorules, lnxuser):
-        default_user = LnxUser.objects.filter(username='root').first()
+        default_user = LnxUser.objects.filter(username="root").first()
         for sudo_rule in sudorules:
             sudo_rule.set_default_runas_user(lnxuser, default_user)
         return sudorules

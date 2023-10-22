@@ -1,14 +1,13 @@
 import ldap
+from apps.ldapconfig.models import LDAPConfig
 from django.http import Http404
 
-from apps.ldapconfig.models import LDAPConfig
 from .discovery import DNSService
 
 
-class LDAPObjectsService():
-
+class LDAPObjectsService:
     def __new__(cls, ldap_obj_class):
-        if not hasattr(cls, 'instance'):
+        if not hasattr(cls, "instance"):
             cls.instance = super(LDAPObjectsService, cls).__new__(cls)
         return cls.instance
 
@@ -44,7 +43,7 @@ class LDAPObjectsService():
             filterstr=self.filterstr,
             attrlist=self.attrlist,
             serverctrls=[ctrl],
-            timeout=50
+            timeout=50,
         )
 
         _r_type, res, _r_mid, srv_crtls = self.connection.result3(
@@ -54,25 +53,22 @@ class LDAPObjectsService():
         return res, srv_crtls
 
     def _perform_search(self, res, search_dname):
-
         for base_dn in search_dname:
             pk = base_dn.pk
-            res[pk]['res'], res[pk]['ctrl'] = self._ldap_search(base_dn, res[pk]['cookie'])
+            res[pk]["res"], res[pk]["ctrl"] = self._ldap_search(base_dn, res[pk]["cookie"])
 
         return res
 
     def _search_on_dn(self, dn, filterstr):
         try:
             return self.connection.search_s(
-                base=dn.dn,
-                scope=dn.get_scope(),
-                filterstr=filterstr,
-                attrlist=['*'])
+                base=dn.dn, scope=dn.get_scope(), filterstr=filterstr, attrlist=["*"]
+            )
         except Exception as exc:
             raise Http404 from exc
 
     def _ldap_search_by_guid(self, base_dn, guid):
-        guid = ''.join([f"\\{guid[i:i+2]}" for i in range(0, len(guid), 2)])
+        guid = "".join([f"\\{guid[i:i+2]}" for i in range(0, len(guid), 2)])
         filterstr = self.return_class.get_objectclass_filter(guid)
         for dn in base_dn:
             result = self._search_on_dn(dn, filterstr)
@@ -98,18 +94,19 @@ class LDAPObjectsService():
 
     def _more_ldap_pages(self, search_res):
         for ldap_search in search_res.values():
-            page_crtl = self._get_page_control(ldap_search['ctrl'])
-            if page_crtl.cookie: return True
+            page_crtl = self._get_page_control(ldap_search["ctrl"])
+            if page_crtl.cookie:
+                return True
         return False
 
     def _set_cookie(self, search_res):
         keep_dn_search = []
         remove_dn_search = []
         for key, ldap_search in search_res.items():
-            page_crtl = self._get_page_control(ldap_search['ctrl'])
+            page_crtl = self._get_page_control(ldap_search["ctrl"])
             if page_crtl.cookie:
                 keep_dn_search.append(key)
-                ldap_search['cookie'].cookie = page_crtl.cookie
+                ldap_search["cookie"].cookie = page_crtl.cookie
             else:
                 remove_dn_search.append(key)
 
@@ -118,7 +115,6 @@ class LDAPObjectsService():
         return keep_dn_search
 
     def _get_dn_ramaining_dn(self, search_dname, keep_dn_search):
-
         new_search_dname = []
         for search_dn in search_dname:
             if search_dn.pk in keep_dn_search:
@@ -127,21 +123,19 @@ class LDAPObjectsService():
         return new_search_dname
 
     def _create_working_dictionary(self, search_dname):
-
         res = {}
         for base_dn in search_dname:
             pk = base_dn.pk
             res[pk] = {}
-            res[pk]['cookie'] = ldap.controls.SimplePagedResultsControl(
+            res[pk]["cookie"] = ldap.controls.SimplePagedResultsControl(
                 criticality=False,
                 size=1000,
-                cookie='',
+                cookie="",
             )
-            res[pk]['res'], res[pk]['ctrl'] = None, None
+            res[pk]["res"], res[pk]["ctrl"] = None, None
         return res
 
     def get_objects(self):
-
         search_dname = list(self._get_dn_to_search())
         search_res = self._create_working_dictionary(search_dname)
 
@@ -149,7 +143,7 @@ class LDAPObjectsService():
             self._perform_search(search_res, search_dname)
 
             for search in search_res.values():
-                for d_name, attrs in search['res']:
+                for d_name, attrs in search["res"]:
                     if d_name is not None:
                         yield self._create_return_object(d_name, attrs)
 
@@ -160,18 +154,17 @@ class LDAPObjectsService():
                 break
 
     def get_object(self, guid):
-
         search_dname = self._get_dn_to_search()
         dn, attrs = self._perform_search_by_guid(search_dname, guid)
         return self._create_return_object(dn, attrs)
 
     def create_object_by_guid(self, guid):
-
         search_dname = self._get_dn_to_search()
         dn, attrs = self._perform_search_by_guid(search_dname, guid)
         entry_defaults = self.return_class.get_defaults(self.ldap_config, attrs)
-        self.return_class.perform_create(self.ldap_config, self.connection,
-            dn, entry_defaults, guid)
+        self.return_class.perform_create(
+            self.ldap_config, self.connection, dn, entry_defaults, guid
+        )
         return self._create_return_object(dn, attrs)
 
     def update_by_instance(self, instance):

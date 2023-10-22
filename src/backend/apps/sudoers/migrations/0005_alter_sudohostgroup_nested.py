@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('sudoers', '0004_sudohostgroup_guidhex'),
+        ("sudoers", "0004_sudohostgroup_guidhex"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='sudohostgroup',
-            name='nested',
-            field=models.ManyToManyField(blank=True, to='sudoers.sudohostgroup'),
+            model_name="sudohostgroup",
+            name="nested",
+            field=models.ManyToManyField(blank=True, to="sudoers.sudohostgroup"),
         ),
     ]

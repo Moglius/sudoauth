@@ -1,9 +1,7 @@
 from rest_framework import viewsets
 
-from .models import (DNSHost, LDAPDn,
-    LDAPConfig)
-from .serializers import (DNSHostSerializer,
-    LDAPDnSerializer, LDAPConfigSerializer)
+from .models import DNSHost, LDAPConfig, LDAPDn
+from .serializers import DNSHostSerializer, LDAPConfigSerializer, LDAPDnSerializer
 
 
 class DNSHostViewSet(viewsets.ModelViewSet):

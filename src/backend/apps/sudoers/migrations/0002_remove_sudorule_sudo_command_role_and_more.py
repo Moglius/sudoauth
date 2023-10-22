@@ -4,19 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('sudoers', '0001_initial'),
+        ("sudoers", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='sudorule',
-            name='sudo_command_role',
+            model_name="sudorule",
+            name="sudo_command_role",
         ),
         migrations.AddField(
-            model_name='sudorule',
-            name='sudo_command_role',
-            field=models.ManyToManyField(to='sudoers.sudocommandrole'),
+            model_name="sudorule",
+            name="sudo_command_role",
+            field=models.ManyToManyField(to="sudoers.sudocommandrole"),
         ),
     ]

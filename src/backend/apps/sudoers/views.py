@@ -1,30 +1,36 @@
+from apps.ldapconn.ldap import LDAPObjectsService
+from apps.ldapconn.models import LDAPNisNetgroup, LDAPSudoRule
 from rest_framework import viewsets
 
-from apps.ldapconn.models import LDAPSudoRule, LDAPNisNetgroup
-from apps.ldapconn.ldap import LDAPObjectsService
-from .models import (SudoRule, SudoCommand, SudoHost,
-    SudoCommandRole, SudoHostGroup)
-from .serializers import (SudoRuleListDetailSerializer,
-    SudoRulePutPatchSerializer, SudoRuleCreateSerializer,
-    SudoCommandSerializer, SudoHostSerializer,
-    SudoCommandRoleListDetailSerializer, SudoCommandRolePutPatchSerializer,
-    SudoCommandRoleCreateSerializer, SudoHostGroupListDetailSerializer,
-    SudoHostGroupPutPatchSerializer, SudoHostGroupCreateSerializer)
+from .models import SudoCommand, SudoCommandRole, SudoHost, SudoHostGroup, SudoRule
+from .serializers import (
+    SudoCommandRoleCreateSerializer,
+    SudoCommandRoleListDetailSerializer,
+    SudoCommandRolePutPatchSerializer,
+    SudoCommandSerializer,
+    SudoHostGroupCreateSerializer,
+    SudoHostGroupListDetailSerializer,
+    SudoHostGroupPutPatchSerializer,
+    SudoHostSerializer,
+    SudoRuleCreateSerializer,
+    SudoRuleListDetailSerializer,
+    SudoRulePutPatchSerializer,
+)
 
 
 class SudoCommandRoleViewSet(viewsets.ModelViewSet):
     queryset = SudoCommandRole.objects.all()
 
     action_serializer_classes = {
-        'list': SudoCommandRoleListDetailSerializer, 
-        'retrieve': SudoCommandRoleListDetailSerializer,
-        'update': SudoCommandRolePutPatchSerializer,
-        'partial_update': SudoCommandRolePutPatchSerializer,
-        'create': SudoCommandRoleCreateSerializer
+        "list": SudoCommandRoleListDetailSerializer,
+        "retrieve": SudoCommandRoleListDetailSerializer,
+        "update": SudoCommandRolePutPatchSerializer,
+        "partial_update": SudoCommandRolePutPatchSerializer,
+        "create": SudoCommandRoleCreateSerializer,
     }
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def get_serializer_class(self):
         try:
@@ -60,15 +66,15 @@ class SudoCommandRoleViewSet(viewsets.ModelViewSet):
 class SudoHostGroupViewSet(viewsets.ModelViewSet):
     queryset = SudoHostGroup.objects.all()
     action_serializer_classes = {
-        'list': SudoHostGroupListDetailSerializer, 
-        'retrieve': SudoHostGroupListDetailSerializer,
-        'update': SudoHostGroupPutPatchSerializer,
-        'partial_update': SudoHostGroupPutPatchSerializer,
-        'create': SudoHostGroupCreateSerializer
+        "list": SudoHostGroupListDetailSerializer,
+        "retrieve": SudoHostGroupListDetailSerializer,
+        "update": SudoHostGroupPutPatchSerializer,
+        "partial_update": SudoHostGroupPutPatchSerializer,
+        "create": SudoHostGroupCreateSerializer,
     }
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def get_serializer_class(self):
         try:
@@ -91,7 +97,7 @@ class SudoHostGroupViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        instance = SudoHostGroup.objects.get(pk=response.data['id'])
+        instance = SudoHostGroup.objects.get(pk=response.data["id"])
         LDAPNisNetgroup.create_or_update_nis_netgroup(instance)
         return response
 
@@ -170,15 +176,15 @@ class SudoRuleViewSet(viewsets.ModelViewSet):
     queryset = SudoRule.objects.all()
 
     action_serializer_classes = {
-        'list': SudoRuleListDetailSerializer, 
-        'retrieve': SudoRuleListDetailSerializer,
-        'update': SudoRulePutPatchSerializer,
-        'partial_update': SudoRulePutPatchSerializer,
-        'create': SudoRuleCreateSerializer
+        "list": SudoRuleListDetailSerializer,
+        "retrieve": SudoRuleListDetailSerializer,
+        "update": SudoRulePutPatchSerializer,
+        "partial_update": SudoRulePutPatchSerializer,
+        "create": SudoRuleCreateSerializer,
     }
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def get_serializer_class(self):
         try:
@@ -194,7 +200,7 @@ class SudoRuleViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        instance = SudoRule.objects.get(pk=response.data['id'])
+        instance = SudoRule.objects.get(pk=response.data["id"])
         LDAPSudoRule.create_or_update_sudo_rule(instance)
         return response
 

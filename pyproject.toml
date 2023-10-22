@@ -1,0 +1,27 @@
+[tool.black]
+line-length = 99
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.tox
+)/
+'''
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+pythonpath = "src/backend"
+testpaths = ["tests"]
+log_cli = true
+log_cli_level = "CRITICAL"
+log_cli_format = "%(message)s"
+
+[tool.bandit]
+exclude_dirs = ["src/backend/sudoauth/settings.py", "src/backend/helpers/builders"]
+skips = ["B604"]

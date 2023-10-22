@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class LdapconfigConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.ldapconfig'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.ldapconfig"

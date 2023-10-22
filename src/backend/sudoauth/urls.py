@@ -14,13 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('testcon/', include('apps.ldapconn.urls')),
-    path('api/sudoers/', include('apps.sudoers.urls')),
-    path('api/lnxusers/', include('apps.lnxusers.urls')),
-    path('api/ldapconfig/', include('apps.ldapconfig.urls')),
-    path('api/ldapconn/', include('apps.ldapconn.urls')),
+    path("admin/", admin.site.urls),
+    path("testcon/", include("apps.ldapconn.urls")),
+    path("api/sudoers/", include("apps.sudoers.urls")),
+    path("api/lnxusers/", include("apps.lnxusers.urls")),
+    path("api/ldapconfig/", include("apps.ldapconfig.urls")),
+    path("api/ldapconn/", include("apps.ldapconn.urls")),
 ]

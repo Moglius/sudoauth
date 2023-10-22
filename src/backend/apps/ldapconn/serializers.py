@@ -18,12 +18,8 @@ class LDAPGroupSerializer(serializers.Serializer):
     sAMAccountName = serializers.CharField(max_length=255)
     cn = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=255)
-    member = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
-    memberOf = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
+    member = serializers.ListField(child=serializers.CharField(max_length=255))
+    memberOf = serializers.ListField(child=serializers.CharField(max_length=255))
     objectSid = serializers.CharField(max_length=255)
     objectGUID = serializers.CharField(max_length=255)
     objectGUIDHex = serializers.CharField(max_length=255)
@@ -34,20 +30,12 @@ class LDAPSudoRuleSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     cn = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=255)
-    sudoCommand = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
-    sudoHost = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
-    sudoOption = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
+    sudoCommand = serializers.ListField(child=serializers.CharField(max_length=255))
+    sudoHost = serializers.ListField(child=serializers.CharField(max_length=255))
+    sudoOption = serializers.ListField(child=serializers.CharField(max_length=255))
     sudoRunAsUser = serializers.CharField(max_length=255)
     sudoRunAsGroup = serializers.CharField(max_length=255)
-    sudoUser = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
+    sudoUser = serializers.ListField(child=serializers.CharField(max_length=255))
     sudoNotBefore = serializers.CharField(max_length=255)
     sudoNotAfter = serializers.CharField(max_length=255)
     sudoOrder = serializers.CharField(max_length=255)
@@ -60,12 +48,8 @@ class LDAPNisNetgroupSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     cn = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=255)
-    nisNetgroupTriple = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
-    memberNisNetgroup = serializers.ListField(
-        child=serializers.CharField(max_length=255)
-    )
+    nisNetgroupTriple = serializers.ListField(child=serializers.CharField(max_length=255))
+    memberNisNetgroup = serializers.ListField(child=serializers.CharField(max_length=255))
     objectGUID = serializers.CharField(max_length=255)
     objectGUIDHex = serializers.CharField(max_length=255)
 
@@ -74,4 +58,4 @@ class LDAPUserGroupCreationSerializer(serializers.Serializer):
     objectGUIDHex = serializers.CharField(max_length=255)
 
     def get_guid(self):
-        return self.data['objectGUIDHex']
+        return self.data["objectGUIDHex"]

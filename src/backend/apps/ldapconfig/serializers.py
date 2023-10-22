@@ -1,31 +1,28 @@
+from apps.lnxusers.serializers import LnxGroupSerializer, LnxShellSerializer
 from rest_framework import serializers
 
-from .models import DNSHost, LDAPDn, LDAPConfig, PoolRange
-from apps.lnxusers.serializers import LnxGroupSerializer, LnxShellSerializer
+from .models import DNSHost, LDAPConfig, LDAPDn, PoolRange
 
 
 class DNSHostSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSHost
-        fields = ['pk', 'hostname']
+        fields = ["pk", "hostname"]
 
 
 class LDAPDnSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = LDAPDn
-        fields = ['pk', 'dn', 'scope']
+        fields = ["pk", "dn", "scope"]
 
 
 class PoolRangeSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = PoolRange
-        fields = ['pk', 'pool_min', 'pool_max']
+        fields = ["pk", "pool_min", "pool_max"]
 
 
 class LDAPConfigSerializer(serializers.ModelSerializer):
-
     dns_hostname = DNSHostSerializer(many=True)
     user_dn = LDAPDnSerializer(many=True)
     group_dn = LDAPDnSerializer(many=True)
@@ -37,10 +34,10 @@ class LDAPConfigSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LDAPConfig
-        exclude = ('ldap_password', )
+        exclude = ("ldap_password",)
 
-    def create(self, validated_data): # POST
-        return ''
+    def create(self, validated_data):  # POST
+        return ""
 
-    def update(self, instance, validated_data): # PATCH, PUT
-        return ''
+    def update(self, instance, validated_data):  # PATCH, PUT
+        return ""

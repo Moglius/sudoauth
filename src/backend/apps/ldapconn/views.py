@@ -1,36 +1,43 @@
-from rest_framework import viewsets, mixins, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from .serializers import (LDAPUserSerializer, LDAPGroupSerializer,
-    LDAPUserGroupCreationSerializer, LDAPSudoRuleSerializer, LDAPNisNetgroupSerializer)
-from .models import LDAPUser, LDAPGroup, LDAPSudoRule, LDAPNisNetgroup
+from .models import LDAPGroup, LDAPNisNetgroup, LDAPSudoRule, LDAPUser
+from .serializers import (
+    LDAPGroupSerializer,
+    LDAPNisNetgroupSerializer,
+    LDAPSudoRuleSerializer,
+    LDAPUserGroupCreationSerializer,
+    LDAPUserSerializer,
+)
 
 
-class LDAPViewSet(mixins.ListModelMixin,
-    mixins.RetrieveModelMixin, mixins.CreateModelMixin,
-    viewsets.GenericViewSet):
+class LDAPViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
     pass
 
 
 class LDAPUserViewSet(LDAPViewSet):
-
     serializer_class = LDAPUserSerializer
 
     def get_queryset(self):
         users = LDAPUser.get_objects_list()
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get("name")
         if name:
             return [user for user in users if user.apply_filter(name)]
         return users
 
     action_serializer_classes = {
-        'list': LDAPUserSerializer, 
-        'retrieve': LDAPUserSerializer,
-        'create': LDAPUserGroupCreationSerializer
+        "list": LDAPUserSerializer,
+        "retrieve": LDAPUserSerializer,
+        "create": LDAPUserGroupCreationSerializer,
     }
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def get_serializer_class(self):
         try:
@@ -53,24 +60,23 @@ class LDAPUserViewSet(LDAPViewSet):
 
 
 class LDAPGroupViewSet(LDAPViewSet):
-
     serializer_class = LDAPGroupSerializer
 
     def get_queryset(self):
         groups = LDAPGroup.get_objects_list()
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get("name")
         if name:
             return [group for group in groups if group.apply_filter(name)]
         return groups
 
     action_serializer_classes = {
-        'list': LDAPGroupSerializer, 
-        'retrieve': LDAPGroupSerializer,
-        'create': LDAPUserGroupCreationSerializer
+        "list": LDAPGroupSerializer,
+        "retrieve": LDAPGroupSerializer,
+        "create": LDAPUserGroupCreationSerializer,
     }
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {"request": self.request}
 
     def get_serializer_class(self):
         try:
@@ -93,13 +99,12 @@ class LDAPGroupViewSet(LDAPViewSet):
 
 
 class LDAPSudoRuleViewSet(LDAPViewSet):
-
     serializer_class = LDAPSudoRuleSerializer
-    http_method_names = ['get', 'head']
+    http_method_names = ["get", "head"]
 
     def get_queryset(self):
         rules = LDAPSudoRule.get_objects_list()
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get("name")
         if name:
             return [rule for rule in rules if rule.apply_filter(name)]
         return rules
@@ -111,13 +116,12 @@ class LDAPSudoRuleViewSet(LDAPViewSet):
 
 
 class LDAPNisNetgroupViewSet(LDAPViewSet):
-
     serializer_class = LDAPNisNetgroupSerializer
-    http_method_names = ['get', 'head']
+    http_method_names = ["get", "head"]
 
     def get_queryset(self):
         rules = LDAPNisNetgroup.get_objects_list()
-        name = self.request.query_params.get('name')
+        name = self.request.query_params.get("name")
         if name:
             return [rule for rule in rules if rule.apply_filter(name)]
         return rules

@@ -1,6 +1,5 @@
-from django.urls import path, include
-
+from django.urls import include, path
 
 urlpatterns = [
-    path('', include('apps.lnxusers.routers')),
+    path("", include("apps.lnxusers.routers")),
 ]
