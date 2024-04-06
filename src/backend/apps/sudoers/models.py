@@ -86,8 +86,8 @@ class SudoCommandRole(models.Model):
 class SudoRule(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
-    sudo_user_users = models.ManyToManyField("lnxusers.LnxUser")
-    sudo_user_groups = models.ManyToManyField("lnxusers.LnxGroup")
+    sudo_user_users = models.ManyToManyField("lnxusers.LnxUser", blank=True)
+    sudo_user_groups = models.ManyToManyField("lnxusers.LnxGroup", blank=True)
 
     sudo_host_servers = models.ManyToManyField(SudoHost)
     sudo_host_groups = models.ManyToManyField(SudoHostGroup)

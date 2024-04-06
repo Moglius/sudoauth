@@ -98,6 +98,14 @@ class SudoRulePutPatchSerializer(serializers.ModelSerializer):
             "name": {"read_only": True},
         }
 
+    def validate(self, attrs):
+        if len(attrs["sudo_user_users"]) == 0 and len(attrs["sudo_user_groups"]) == 0:
+            raise serializers.ValidationError(
+                "sudo_user_users/sudo_user_groups fields cannot be both null/blank."
+            )
+
+        return super().validate(attrs)
+
 
 class SudoRuleCreateSerializer(serializers.ModelSerializer):
     class Meta:
