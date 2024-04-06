@@ -20,6 +20,8 @@ def _is_valid_path(value):
 
 
 def _is_valid_hostname(value):
+    if value == "ALL":
+        return True
     if len(value) > 253 or len(value) < 4:
         return False
     if value[-1] == ".":
