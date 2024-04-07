@@ -1,0 +1,29 @@
+<div *ngIf="putFrom" class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">ID</span>
+  <input type="text" class="form-control" placeholder="id" disabled
+  aria-label="id" aria-describedby="basic-addon1" [ngModel]="command.pk">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">diggest</span>
+  <input type="text" class="form-control" placeholder="diggest"
+  aria-label="diggest" aria-describedby="basic-addon1" [(ngModel)]="command.diggest">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">command</span>
+  <input type="text" class="form-control" placeholder="command"
+  aria-label="command" aria-describedby="basic-addon1" [(ngModel)]="command.command">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">args</span>
+  <input type="text" class="form-control" placeholder="args"
+  aria-label="args" aria-describedby="basic-addon1" [(ngModel)]="command.args">
+</div>
+
+<div>
+  <button *ngIf="putFrom" (click)="updateHost(command)" data-bs-dismiss="modal" class="btn btn-primary">Edit</button>
+  <button *ngIf="! putFrom" (click)="addHost(command)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeClick()">Close</button>
+</div>

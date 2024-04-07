@@ -1,0 +1,23 @@
+<div *ngIf="putFrom" class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">ID</span>
+  <input type="text" class="form-control" placeholder="id" disabled
+  aria-label="id" aria-describedby="basic-addon1" [ngModel]="host.pk">
+</div>
+
+<div *ngIf="putFrom" class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">hostname</span>
+  <input type="text" class="form-control" placeholder="lnxshell"
+  aria-label="lnxshell" aria-describedby="basic-addon1" [(ngModel)]="host.hostname">
+</div>
+
+<div *ngIf="! putFrom" class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">hostname</span>
+  <input type="text" class="form-control" placeholder="hostname"
+  aria-label="hostname" aria-describedby="basic-addon1" [(ngModel)]="host">
+</div>
+
+<div>
+<button *ngIf="putFrom" (click)="updateHost(host)" data-bs-dismiss="modal" class="btn btn-primary">Edit</button>
+<button *ngIf="! putFrom" (click)="addHost(host)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeClick()">Close</button>
+</div>
