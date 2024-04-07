@@ -104,6 +104,16 @@ class SudoRulePutPatchSerializer(serializers.ModelSerializer):
                 "sudo_user_users/sudo_user_groups fields cannot be both null/blank."
             )
 
+        if len(attrs["sudo_host_groups"]) == 0 and len(attrs["sudo_host_servers"]) == 0:
+            raise serializers.ValidationError(
+                "sudo_host_groups/sudo_host_servers fields cannot be both null/blank."
+            )
+
+        if len(attrs["sudo_command"]) == 0 and len(attrs["sudo_command_role"]) == 0:
+            raise serializers.ValidationError(
+                "sudo_command/sudo_command_role fields cannot be both null/blank."
+            )
+
         return super().validate(attrs)
 
 
