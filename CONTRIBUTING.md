@@ -28,6 +28,19 @@ pip install --upgrade pip
 pip install -r requirements-dev.txt \
     -r src/backend/requirements.txt
 
+## Upgrade packages
+
+### in dev virtual env
+
+pur -r requirements-dev.txt
+pip install -r requirements-dev.txt
+
+### in app virutal env
+
+pur -r requirements.txt
+pip install -r requirements.txt
+
+
 ## Install pre-commit hooks
 
 pip install pre-commit
@@ -67,3 +80,8 @@ npm install
 ### Run frontend app
 
 ng serve
+
+
+### Upgrade Angular
+
+ng update @angular/cli @angular/core
