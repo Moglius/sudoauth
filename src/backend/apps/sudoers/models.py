@@ -89,11 +89,11 @@ class SudoRule(models.Model):
     sudo_user_users = models.ManyToManyField("lnxusers.LnxUser", blank=True)
     sudo_user_groups = models.ManyToManyField("lnxusers.LnxGroup", blank=True)
 
-    sudo_host_servers = models.ManyToManyField(SudoHost)
-    sudo_host_groups = models.ManyToManyField(SudoHostGroup)
+    sudo_host_servers = models.ManyToManyField(SudoHost, blank=True)
+    sudo_host_groups = models.ManyToManyField(SudoHostGroup, blank=True)
 
-    sudo_command = models.ManyToManyField(SudoCommand)
-    sudo_command_role = models.ManyToManyField(SudoCommandRole)
+    sudo_command = models.ManyToManyField(SudoCommand, blank=True)
+    sudo_command_role = models.ManyToManyField(SudoCommandRole, blank=True)
 
     run_as_user = models.ForeignKey(
         "lnxusers.LnxUser", related_name="sudorule_runasuser_set", on_delete=models.CASCADE
