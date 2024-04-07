@@ -59,7 +59,6 @@ pre-commit run bandit --all-files
 cd /home/mmoglia/Develop/sudoauth/src/backend
 python manage.py runserver
 
-
 ## Install Angular
 
 ### Install nodejs
@@ -80,7 +79,6 @@ npm install
 ### Run frontend app
 
 ng serve
-
 
 ### Upgrade Angular
 
