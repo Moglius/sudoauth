@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { LnxuserService } from 'src/app/lnxuser.service';
 
@@ -8,9 +9,13 @@ import { LnxuserService } from 'src/app/lnxuser.service';
 })
 export class AddEditSudoroleComponent implements OnInit{
 
-  constructor(private service: LnxuserService) {  }
+  constructor(private service: LnxuserService, private router: Router) {  }
+
+  @Output() closeChild: EventEmitter<any> = new EventEmitter();
 
   readonly commandsUrl = 'http://localhost:8000/api/sudoers/commands/';
+  readonly rolesUrl = 'http://localhost:8000/api/sudoers/roles/';
+  role_name: any;
   commands: any[] = [];
   targetCommands: any[] = [];
 
@@ -20,7 +25,23 @@ export class AddEditSudoroleComponent implements OnInit{
   updateRole(role: any){
   }
 
-  addRole(role: any){
+  addRole(role_name: string, selectedCommands: any[]){
+
+    let commands: Number[] = [];
+
+    selectedCommands.forEach(element => {
+      commands.push(element["pk"]);
+    });
+
+    let role = {
+      "name": role_name,
+      "commands": commands
+    };
+
+    this.service.addEntry(this.rolesUrl, role).subscribe(() => {
+      this.closeChild.emit(null);
+      this.router.navigate(["/sudoroles"]);
+    });
   }
 
   ngOnInit(): void {
