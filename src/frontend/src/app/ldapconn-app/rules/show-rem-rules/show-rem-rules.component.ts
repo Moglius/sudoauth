@@ -68,17 +68,13 @@ export class ShowRemRulesComponent implements OnInit {
     this.refreshLdapRulesList(this.apiurl);
   }
 
-  FilterFn(){
-    var ldaprulesFilter = this.ldaprulesFilter;
+  FilterFn(event: any){
 
-    this.ldaprulesList = this.ldaprulesListWithoutFilter.filter(function (ldaprule: any){
-        return ldaprule.objectGUIDHex.toString().toLowerCase().includes(
-          ldaprulesFilter.toString().trim().toLowerCase()
-        )||
-        ldaprule.cn.toString().toLowerCase().includes(
-          ldaprulesFilter.toString().trim().toLowerCase()
-        )
-    });
+    if (!event.target || event.target.value.length > 2) {
+      this.refreshLdapRulesList(`${this.apiurl}?name=${event.target.value}`);
+    } else {
+      this.refreshLdapRulesList(this.apiurl);
+    }
   }
 
 }

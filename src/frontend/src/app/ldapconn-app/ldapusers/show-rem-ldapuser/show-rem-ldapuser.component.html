@@ -3,8 +3,8 @@
   <ul class="pagination justify-content-end">
     <li>
       <div class="page-item">
-        <input [(ngModel)]="ldapusersFilter" class="form-control"
-        (keyup)="FilterFn()" placeholder="Filter users">
+        <input class="form-control"
+        (keydown.enter)="FilterFn($event)" placeholder="Filter users (press Enter key)">
       </div>
     </li>
     <li class="page-item" [ngClass]="{disabled: previous === ''}">

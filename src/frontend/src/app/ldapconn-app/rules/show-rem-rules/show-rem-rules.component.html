@@ -2,8 +2,8 @@
   <ul class="pagination justify-content-end">
     <li>
       <div class="page-item">
-        <input [(ngModel)]="ldaprulesFilter" class="form-control"
-        (keyup)="FilterFn()" placeholder="Filter sudo rules">
+        <input class="form-control"
+        (keydown.enter)="FilterFn($event)" placeholder="Filter sudo rules (Press Enter key)">
       </div>
     </li>
     <li class="page-item" [ngClass]="{disabled: previous === ''}">
