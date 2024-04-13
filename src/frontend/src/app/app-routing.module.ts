@@ -13,6 +13,7 @@ import { CommandsComponent } from './sudoers-app/commands/commands.component';
 import { SudorolesComponent } from './sudoers-app/sudoroles/sudoroles.component';
 import { HostgroupsComponent } from './sudoers-app/hostgroups/hostgroups.component';
 import { AddEditSudoroleComponent } from './sudoers-app/sudoroles/add-edit-sudorole/add-edit-sudorole.component';
+import { DashboardAppComponent } from './dashboard-app/dashboard-app.component';
 
 const routes: Routes = [
   {path: 'lnxusers', component: LnxusersComponent},
@@ -27,6 +28,7 @@ const routes: Routes = [
   {path: 'commands', component: CommandsComponent},
   {path: 'hosts', component: HostsComponent},
   {path: 'hostgroups', component: HostgroupsComponent},
+  {path: '', component: DashboardAppComponent},
 ];
 
 @NgModule({
