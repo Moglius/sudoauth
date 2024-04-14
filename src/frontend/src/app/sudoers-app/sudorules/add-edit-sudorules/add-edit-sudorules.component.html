@@ -1,1 +1,104 @@
-<p>add-edit-sudorules works!</p>
+<div class="row mt-5">
+  <div class="row">
+    <div class="input-group mb-3 col-sm">
+      <span class="input-group-text" id="basic-addon1">Sudo Rule Name:</span>
+      <input type="text" class="form-control" placeholder="sudo-rule-name (Placeholder)"
+      aria-label="sudo-rule-admin" aria-describedby="basic-addon1" [(ngModel)]="sudo_rule_name">
+    </div>
+    <div class="col-sm">
+      <button [disabled]="!(sudo_rule_name && targetCommands.length && run_as_user > 0 && run_as_group > 0)"
+      (click)="addSudoRule(sudo_rule_name, targetCommands, targetHosts, targetUsers, run_as_user, run_as_group)" data-bs-dismiss="modal"
+      class="btn btn-primary">Add</button>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-sm">
+      <label>Run as User</label>
+      <select [(ngModel)]="run_as_user" class="form-select" aria-label="Default select example">
+        <option value="0" selected>Select one option</option>
+        <option *ngFor="let user of users" [value]="user.pk">
+          {{ user.username }}
+        </option>
+      </select>
+    </div>
+    <div class="col-sm">
+      <div class="col-sm">
+        <label>Run as group</label>
+        <select [(ngModel)]="run_as_group" class="form-select" aria-label="Default select example">
+          <option value="0" selected>Select one option</option>
+          <option *ngFor="let group of groups" [value]="group.pk">
+            {{ group.groupname }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-5">
+      <label for="options">Commands:</label>
+      <select multiple class="form-select" id="commands" [(ngModel)]="selectedCommands">
+        <option *ngFor="let command of commands" [value]="command" (dblclick)="moveSelectedCommands(commands)">{{command.full_command}}</option>
+      </select>
+    </div>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedCommands(commands)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllCommands()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedCommands(targetCommands)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllCommands()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-commands">Selected Commands:</label>
+      <select multiple class="form-select" id="selected-commands" [(ngModel)]="selectedSelectedCommands">
+        <option *ngFor="let command of targetCommands" [value]="command" (dblclick)="removeSelectedCommands(targetCommands)">{{command.full_command}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-5">
+      <label for="options">Hosts:</label>
+      <select multiple class="form-select" id="hosts" [(ngModel)]="selectedHosts">
+        <option *ngFor="let host of hosts" [value]="host" (dblclick)="moveSelectedHosts(hosts)">{{host.hostname}}</option>
+      </select>
+    </div>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedHosts(hosts)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllHosts()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedHosts(targetHosts)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllHosts()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-hosts">Selected Hosts:</label>
+      <select multiple class="form-select" id="selected-hosts" [(ngModel)]="selectedSelectedHosts">
+        <option *ngFor="let host of targetHosts" [value]="host" (dblclick)="removeSelectedHosts(targetHosts)">{{host.hostname}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-5">
+      <label for="options">Users:</label>
+      <select multiple class="form-select" id="users" [(ngModel)]="selectedUsers">
+        <option *ngFor="let user of users" [value]="user" (dblclick)="moveSelectedUsers(users)">{{user.username}}</option>
+      </select>
+    </div>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedUsers(users)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllUsers()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedUsers(targetUsers)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllUsers()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-users">Selected Users:</label>
+      <select multiple class="form-select" id="selected-users" [(ngModel)]="selectedSelectedUsers">
+        <option *ngFor="let user of targetUsers" [value]="user" (dblclick)="removeSelectedUsers(targetUsers)">{{user.username}}</option>
+      </select>
+    </div>
+  </div>
+
+</div>

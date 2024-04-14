@@ -8,10 +8,13 @@ import { LnxuserService } from 'src/app/lnxuser.service';
 })
 export class ShowRemSudorulesComponent implements OnInit{
 
-  readonly apiurl = 'http://localhost:8000/api/sudoers/rules/';
+  readonly apiurl = "http://localhost:8000/api/sudoers/rules/";
   sudorulesList: any = [];
-  next: string = '';
-  previous: string = '';
+  next: string = "";
+  previous: string = "";
+  addButtonText = "Add Sudo Rule";
+  sudoRuleFilter: string = "";
+  roleListWithoutFilter: any = [];
 
   constructor(private service: LnxuserService) {}
 
@@ -22,6 +25,7 @@ export class ShowRemSudorulesComponent implements OnInit{
   refreshSudorulesList(url: string) {
     this.service.getLnxUsersList(url).subscribe(data=>{
       this.sudorulesList = data.results;
+      this.roleListWithoutFilter = data.results;
 
       if (data.next) {
         this.next = data.next;
@@ -57,6 +61,17 @@ export class ShowRemSudorulesComponent implements OnInit{
     let servers = sudorule.sudo_host_servers.map((obj: { hostname: string; }) => obj.hostname);
     let groups = sudorule.sudo_host_groups.map((obj: { name: string; }) => `+${obj.name}`);
     return servers.concat(groups).join(', ');
+  }
+
+  FilterFn(){
+    var lnxRuleFilter = this.sudoRuleFilter;
+
+    this.sudorulesList = this.roleListWithoutFilter.filter(function (sudorule: any){
+        return sudorule.name.toString().toLowerCase().includes(
+          lnxRuleFilter.toString().trim().toLowerCase()
+        )
+    });
+
   }
 
 }
