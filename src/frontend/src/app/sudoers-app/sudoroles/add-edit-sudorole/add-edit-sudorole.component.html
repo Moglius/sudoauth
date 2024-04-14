@@ -1,15 +1,15 @@
-<div class="row">
-  <div class="row mt-5">
-    <div>
-      <button *ngIf="(role_name && targetCommands.length)" (click)="addRole(role_name, targetCommands)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
-    </div>
-    <div class="input-group mb-3">
+<div class="row mt-5">
+  <div class="row">
+    <div class="input-group mb-3 col-sm">
       <span class="input-group-text" id="basic-addon1">Role Name:</span>
-      <input type="text" class="form-control" placeholder="role-admin"
+      <input type="text" class="form-control" placeholder="role-name (Placeholder)"
       aria-label="role-admin" aria-describedby="basic-addon1" [(ngModel)]="role_name">
     </div>
+    <div class="col-sm">
+      <button [disabled]="!(role_name && targetCommands.length)" (click)="addRole(role_name, targetCommands)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
+    </div>
   </div>
-  <div class="row mt-5">
+  <div class="row">
     <div class="col-5">
       <label for="options">Commands:</label>
       <select multiple class="form-select" id="commands" [(ngModel)]="selectedCommands">

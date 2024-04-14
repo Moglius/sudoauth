@@ -1,1 +1,34 @@
-<p>add-edit-hostgroup works!</p>
+<div class="row mt-5">
+  <div class="row">
+    <div class="input-group mb-3 col-sm">
+      <span class="input-group-text" id="basic-addon1">HostGroup Name:</span>
+      <input type="text" class="form-control" placeholder="hostgroup-name (Placeholder)"
+      aria-label="hostgroup-admin" aria-describedby="basic-addon1" [(ngModel)]="hostgroup_name">
+    </div>
+    <div class="col-sm">
+      <button [disabled]="!(hostgroup_name && targetHosts.length)" (click)="addHostGroup(hostgroup_name, targetHosts)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-5">
+      <label for="options">Hosts:</label>
+      <select multiple class="form-select" id="hosts" [(ngModel)]="selectedHosts">
+        <option *ngFor="let host of hosts" [value]="host" (dblclick)="moveSelectedHosts(hosts)">{{host.hostname}}</option>
+      </select>
+    </div>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedHosts(hosts)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllHosts()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedHosts(targetHosts)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllHosts()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-hosts">Selected Hosts:</label>
+      <select multiple class="form-select" id="selected-hosts" [(ngModel)]="selectedSelectedHosts">
+        <option *ngFor="let host of targetHosts" [value]="host" (dblclick)="removeSelectedHosts(targetHosts)">{{host.hostname}}</option>
+      </select>
+    </div>
+  </div>
+</div>
