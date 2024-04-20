@@ -74,4 +74,12 @@ export class ShowRemSudorulesComponent implements OnInit{
 
   }
 
+  deleteClick(sudo_rule: any) {
+    if (confirm('are you sure?')) {
+      this.service.deleteEntry(this.apiurl + sudo_rule.id + '/').subscribe(data => {
+        this.refreshSudorulesList(this.apiurl);
+      });
+    }
+  }
+
 }

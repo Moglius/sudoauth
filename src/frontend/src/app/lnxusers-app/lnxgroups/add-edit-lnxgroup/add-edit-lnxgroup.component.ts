@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { catchError } from 'rxjs';
 import { LnxuserService } from 'src/app/lnxuser.service';
 
 @Component({
@@ -23,7 +24,9 @@ export class AddEditLnxgroupComponent implements OnInit{
 
   updateLnxGroup(lnxgroup: any){
     let val = { 'gid_number': lnxgroup.gid_number }
-    this.service.updateEntry(this.url + lnxgroup.pk + '/', val).subscribe(() => {
+    this.service.updateEntry(this.url + lnxgroup.pk + '/', val).pipe(
+      catchError(() => [this.closeChild.emit(null)]),
+    ).subscribe(() => {
       this.closeChild.emit(null);
     });
   }
