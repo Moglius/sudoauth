@@ -1,1 +1,54 @@
-<p>add-edit-lnxuser works!</p>
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">ID</span>
+  <input type="text" class="form-control" placeholder="id" disabled
+  aria-label="id" aria-describedby="basic-addon1" [ngModel]="lnxuser.pk">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">username</span>
+  <input type="text" class="form-control" placeholder="username" disabled
+  aria-label="username" aria-describedby="basic-addon1" [ngModel]="lnxuser.username">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">gecos</span>
+  <input type="text" class="form-control" placeholder="gecos" disabled
+  aria-label="gecos" aria-describedby="basic-addon1" [(ngModel)]="lnxuser.gecos">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">uid_number</span>
+  <input type="text" class="form-control" placeholder="uid_number"
+  aria-label="uid_number" aria-describedby="basic-addon1" [(ngModel)]="lnxuser.uid_number">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text" id="basic-addon1">home_dir</span>
+  <input type="text" class="form-control" placeholder="home_dir"
+  aria-label="home_dir" aria-describedby="basic-addon1" [(ngModel)]="lnxuser.home_dir">
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text">Primary group</span>
+  <select [(ngModel)]="primary_group" class="form-select" aria-label="Default select example">
+    <option value="0" selected>Select one option</option>
+    <option *ngFor="let group of groups" [value]="group.pk" [selected]="lnxuser.primary_group.pk == group.pk">
+      {{ group.groupname }}
+    </option>
+  </select>
+</div>
+
+<div class="input-group mb-3">
+  <span class="input-group-text">Primary group</span>
+  <select [(ngModel)]="shell" class="form-select" aria-label="Default select example">
+    <option value="0" selected>Select one option</option>
+    <option *ngFor="let shell of shells" [value]="shell.pk" [selected]="lnxuser.login_shell.pk == shell.pk">
+      {{ shell.shell }}
+    </option>
+  </select>
+</div>
+
+<div>
+<button (click)="updateLnxUser(lnxuser, primary_group, shell)" data-bs-dismiss="modal" class="btn btn-primary">Edit</button>
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeClick()">Close</button>
+</div>

@@ -31,13 +31,35 @@
       <td>{{ lnxuser.login_shell.shell }}</td>
       <td>{{ lnxuser.home_dir }}</td>
       <td>
-        <button type="button" class="btn btn-warning mr">
+        <button type="button" class="btn btn-info"
+        data-bs-toggle="modal" data-bs-target="#exampleModal"
+        (click)="editClick(lnxuser)" data-backdrop="static" data-keyboard="false">
           Edit
         </button>
-        <button type="button" class="btn btn-danger mr-1">
-          Remove
+        <button type="button" class="btn btn-danger" (click)="deleteClick(lnxuser)">
+          Delete
         </button>
       </td>
     </tr>
   </tbody>
 </table>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">{{ modalTitle }}</h1>
+        <button type="button" class="btn-close"
+        data-bs-dismiss="modal" aria-label="Close" (click)="closeClick()" (closeChild)="closeClick()"></button>
+
+      </div>
+      <div class="modal-body">
+        <app-add-edit-lnxuser [lnxuser_dep]='lnxuser_dep'
+        *ngIf="activateAddEditComponent" (closeChild)="activateAddEditComponent = false" (closeChild)="closeClick()"></app-add-edit-lnxuser>
+        <div ></div>
+      </div>
+    </div>
+  </div>
+</div>
