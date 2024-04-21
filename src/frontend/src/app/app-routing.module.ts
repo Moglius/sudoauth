@@ -32,6 +32,7 @@ const routes: Routes = [
   {path: 'hosts', component: HostsComponent},
   {path: 'hostgroups', component: HostgroupsComponent},
   {path: 'hostgroups/create', component: AddEditHostgroupComponent},
+  {path: 'hostgroups/edit/:id', component: AddEditHostgroupComponent},
   {path: '', component: DashboardAppComponent},
 ];
 

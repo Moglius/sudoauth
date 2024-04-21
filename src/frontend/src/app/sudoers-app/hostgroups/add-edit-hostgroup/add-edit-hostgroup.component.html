@@ -2,11 +2,12 @@
   <div class="row">
     <div class="input-group mb-3 col-sm">
       <span class="input-group-text" id="basic-addon1">HostGroup Name:</span>
-      <input type="text" class="form-control" placeholder="hostgroup-name (Placeholder)"
+      <input type="text" class="form-control" placeholder="hostgroup-name (Placeholder)" [disabled]="id !== undefined"
       aria-label="hostgroup-admin" aria-describedby="basic-addon1" [(ngModel)]="hostgroup_name">
     </div>
     <div class="col-sm">
-      <button [disabled]="!(hostgroup_name && targetHosts.length)" (click)="addHostGroup(hostgroup_name, targetHosts)" data-bs-dismiss="modal" class="btn btn-primary">Add</button>
+      <button *ngIf="id === undefined" [disabled]="!(hostgroup_name && targetHosts.length)" (click)="addHostGroup(hostgroup_name, targetHosts)" class="btn btn-primary">Add</button>
+      <button *ngIf="id !== undefined" [disabled]="!(hostgroup_name && targetHosts.length)" (click)="updateHostGroup(id, targetHosts)" class="btn btn-primary">Edit</button>
     </div>
   </div>
   <div class="row">
