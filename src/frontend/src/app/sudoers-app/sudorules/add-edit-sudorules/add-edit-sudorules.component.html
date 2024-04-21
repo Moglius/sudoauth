@@ -2,13 +2,16 @@
   <div class="row">
     <div class="input-group mb-3 col-sm">
       <span class="input-group-text" id="basic-addon1">Sudo Rule Name:</span>
-      <input type="text" class="form-control" placeholder="sudo-rule-name (Placeholder)"
+      <input type="text" class="form-control" placeholder="sudo-rule-name (Placeholder)" [disabled]="id !== undefined"
       aria-label="sudo-rule-admin" aria-describedby="basic-addon1" [(ngModel)]="sudo_rule_name">
     </div>
     <div class="col-sm">
-      <button [disabled]="!(sudo_rule_name && targetCommands.length && run_as_user > 0 && run_as_group > 0)"
-      (click)="addSudoRule(sudo_rule_name, targetCommands, targetHosts, targetUsers, run_as_user, run_as_group)" data-bs-dismiss="modal"
+      <button *ngIf="id === undefined" [disabled]="!(sudo_rule_name && targetCommands.length && run_as_user > 0 && run_as_group > 0)"
+      (click)="addSudoRule(sudo_rule_name, targetCommands, targetRoles, targetHosts, targetHostGroups, targetUsers, targetGroups, run_as_user, run_as_group)"
       class="btn btn-primary">Add</button>
+      <button *ngIf="id !== undefined" [disabled]="!(sudo_rule_name && targetCommands.length && run_as_user > 0 && run_as_group > 0)"
+        (click)="updateSudoRule(id, targetCommands, targetRoles, targetHosts, targetHostGroups, targetUsers, targetGroups, run_as_user, run_as_group)"
+        class="btn btn-primary">Edit</button>
     </div>
   </div>
   <div class="row mt-3">
@@ -16,7 +19,7 @@
       <label>Run as User</label>
       <select [(ngModel)]="run_as_user" class="form-select" aria-label="Default select example">
         <option value="0" selected>Select one option</option>
-        <option *ngFor="let user of users" [value]="user.pk">
+        <option *ngFor="let user of users_dropdown" [value]="user.pk">
           {{ user.username }}
         </option>
       </select>
@@ -26,7 +29,7 @@
         <label>Run as group</label>
         <select [(ngModel)]="run_as_group" class="form-select" aria-label="Default select example">
           <option value="0" selected>Select one option</option>
-          <option *ngFor="let group of groups" [value]="group.pk">
+          <option *ngFor="let group of groups_dropdown" [value]="group.pk">
             {{ group.groupname }}
           </option>
         </select>
@@ -57,6 +60,28 @@
   </div>
   <div class="row mt-5">
     <div class="col-5">
+      <label for="options">Roles:</label>
+      <select multiple class="form-select" id="roles" [(ngModel)]="selectedRoles">
+        <option *ngFor="let role of roles" [value]="role" (dblclick)="moveSelectedRoles(roles)">{{role.name}}</option>
+      </select>
+    </div>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedRoles(roles)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllRoles()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedRoles(targetRoles)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllRoles()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-roles">Selected Roles:</label>
+      <select multiple class="form-select" id="selected-roles" [(ngModel)]="selectedSelectedRoles">
+        <option *ngFor="let role of targetRoles" [value]="role" (dblclick)="removeSelectedRoles(targetRoles)">{{role.name}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-5">
       <label for="options">Hosts:</label>
       <select multiple class="form-select" id="hosts" [(ngModel)]="selectedHosts">
         <option *ngFor="let host of hosts" [value]="host" (dblclick)="moveSelectedHosts(hosts)">{{host.hostname}}</option>
@@ -74,6 +99,28 @@
       <label for="selected-hosts">Selected Hosts:</label>
       <select multiple class="form-select" id="selected-hosts" [(ngModel)]="selectedSelectedHosts">
         <option *ngFor="let host of targetHosts" [value]="host" (dblclick)="removeSelectedHosts(targetHosts)">{{host.hostname}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-5">
+      <label for="options">Host Groups:</label>
+      <select multiple class="form-select" id="hostgroups" [(ngModel)]="selectedHostGroups">
+        <option *ngFor="let hostgroup of hostgroups" [value]="hostgroup" (dblclick)="moveSelectedHostGroups(hostgroups)">{{hostgroup.name}}</option>
+      </select>
+    </div>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedHostGroups(hosts)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllHostGroups()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedHostGroups(targetHostGroups)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllHostGroups()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-hosts">Selected HostGroups:</label>
+      <select multiple class="form-select" id="selected-hosts" [(ngModel)]="selectedSelectedHostGroups">
+        <option *ngFor="let hostgroup of targetHostGroups" [value]="hostgroup" (dblclick)="removeSelectedHostGroups(targetHostGroups)">{{hostgroup.name}}</option>
       </select>
     </div>
   </div>
@@ -97,6 +144,29 @@
       <label for="selected-users">Selected Users:</label>
       <select multiple class="form-select" id="selected-users" [(ngModel)]="selectedSelectedUsers">
         <option *ngFor="let user of targetUsers" [value]="user" (dblclick)="removeSelectedUsers(targetUsers)">{{user.username}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-5">
+      <label for="options">Groups:</label>
+      <select multiple class="form-select" id="groups" [(ngModel)]="selectedGroups">
+        <option *ngFor="let group of groups" [value]="group" (dblclick)="moveSelectedGroups(groups)">{{group.groupname}}</option>
+      </select>
+    </div>
+    <div class="col-2">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-primary" (click)="moveSelectedGroups(groups)">Add &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="moveAllGroups()">Add All &raquo;</button>
+        <button type="button" class="btn btn-primary" (click)="removeSelectedGroups(targetGroups)">&laquo; Remove</button>
+        <button type="button" class="btn btn-primary" (click)="removeAllGroups()">Remove All &raquo;</button>
+      </div>
+    </div>
+    <div class="col-5">
+      <label for="selected-groups">Selected Groups:</label>
+      <select multiple class="form-select" id="selected-groups" [(ngModel)]="selectedSelectedGroups">
+        <option *ngFor="let group of targetGroups" [value]="group" (dblclick)="removeSelectedGroups(targetGroups)">{{group.groupname}}</option>
       </select>
     </div>
   </div>

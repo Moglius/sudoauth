@@ -44,11 +44,7 @@
       <td>{{ role.name }}</td>
       <td>{{ get_commands(role) }}</td>
       <td>
-        <button type="button" class="btn btn-info"
-          data-bs-toggle="modal" data-bs-target="#exampleModal"
-          (click)="editClick(role)" data-backdrop="static" data-keyboard="false">
-            Edit
-        </button>
+        <a class="btn btn-primary" [routerLink]="['edit', role.id]">Edit</a>
         <button type="button" class="btn btn-danger" (click)="deleteClick(role)">
           Delete
         </button>

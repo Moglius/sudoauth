@@ -48,9 +48,7 @@
       <td>{{ get_hosts(sudorule) }}</td>
       <td>{{ sudorule.guidhex }}</td>
       <td>
-        <button type="button" class="btn btn-warning mr">
-          Edit
-        </button>
+        <a class="btn btn-primary" [routerLink]="['edit', sudorule.id]">Edit</a>
         <button type="button" class="btn btn-danger" (click)="deleteClick(sudorule)">
           Delete
         </button>
