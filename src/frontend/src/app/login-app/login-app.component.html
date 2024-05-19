@@ -1,0 +1,20 @@
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Tabs Titles -->
+
+    <!-- Icon -->
+    <div class="fadeIn first">
+      <i class="bi bi-box-arrow-right"></i>
+    </div>
+
+    <!-- Login Form -->
+    <form>
+      <input type="text" id="username" class="fadeIn second"
+        name="username" placeholder="username" [(ngModel)]="username">
+      <input type="password" id="password" class="fadeIn third"
+        name="password" placeholder="password" [(ngModel)]="password">
+      <input type="submit" (click)="login(username, password)" class="fadeIn fourth" value="Log In">
+    </form>
+
+  </div>
+</div>

@@ -16,8 +16,9 @@ import { AddEditSudoroleComponent } from './sudoers-app/sudoroles/add-edit-sudor
 import { DashboardAppComponent } from './dashboard-app/dashboard-app.component';
 import { AddEditHostgroupComponent } from './sudoers-app/hostgroups/add-edit-hostgroup/add-edit-hostgroup.component';
 import { AddEditSudorulesComponent } from './sudoers-app/sudorules/add-edit-sudorules/add-edit-sudorules.component';
+import { LoginAppComponent } from './login-app/login-app.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {path: 'lnxusers', component: LnxusersComponent},
   {path: 'lnxgroups', component: LnxgroupsComponent},
   {path: 'lnxshells', component: LnxshellsComponent},
@@ -35,6 +36,7 @@ const routes: Routes = [
   {path: 'hostgroups', component: HostgroupsComponent},
   {path: 'hostgroups/create', component: AddEditHostgroupComponent},
   {path: 'hostgroups/edit/:id', component: AddEditHostgroupComponent},
+  {path: 'login', component: LoginAppComponent },
   {path: '', component: DashboardAppComponent},
 ];
 
