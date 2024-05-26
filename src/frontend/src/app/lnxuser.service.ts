@@ -36,6 +36,7 @@ export class LnxuserService {
         localStorage.setItem('token', response.token);
         this.currentUserSig.set(response);
         this.router.navigate([""]);
+        window.location.reload();
     });
   }
 
