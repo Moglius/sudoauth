@@ -24,8 +24,9 @@ export class AddEditLnxshellComponent implements OnInit{
 
   updateLnxShell(lnxshell: any){
     let val = { 'shell': lnxshell.shell }
-    this.service.updateEntry(this.url + lnxshell.pk + '/', val).subscribe();
-    this.closeChild.emit(null);
+    this.service.updateEntry(this.url + lnxshell.pk + '/', val).subscribe(() => {
+      this.closeChild.emit(null);
+    });
   }
 
   addLnxShell(lnxshell: any){

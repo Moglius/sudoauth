@@ -77,17 +77,12 @@ export class ShowRemLdapuserComponent implements OnInit{
     this.refreshLdapUsersList(this.apiurl);
   }
 
-  FilterFn(){
-    var ldapusersFilter = this.ldapusersFilter;
+  FilterFn(event: any){
 
-    this.ldapuserList = this.ldapusersListWithoutFilter.filter(function (ldapuser: any){
-        return ldapuser.sAMAccountName.toString().toLowerCase().includes(
-          ldapusersFilter.toString().trim().toLowerCase()
-        )||
-        ldapuser.objectGUIDHex.toString().toLowerCase().includes(
-          ldapusersFilter.toString().trim().toLowerCase()
-        )
-    });
+    if (!event.target || event.target.value.length > 2) {
+      this.refreshLdapUsersList(`${this.apiurl}?name=${event.target.value}`);
+    } else {
+      this.refreshLdapUsersList(this.apiurl);
+    }
   }
-
 }

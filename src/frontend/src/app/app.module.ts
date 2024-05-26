@@ -11,7 +11,7 @@ import { ShowRemLnxgroupComponent } from './lnxusers-app/lnxgroups/show-rem-lnxg
 import { AddEditLnxgroupComponent } from './lnxusers-app/lnxgroups/add-edit-lnxgroup/add-edit-lnxgroup.component';
 import { LnxuserService } from './lnxuser.service';
 
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { LnxshellsComponent } from './lnxusers-app/lnxshells/lnxshells.component';
 import { AddEditLnxshellComponent } from './lnxusers-app/lnxshells/add-edit-lnxshell/add-edit-lnxshell.component';
@@ -40,6 +40,8 @@ import { AddEditSudoroleComponent } from './sudoers-app/sudoroles/add-edit-sudor
 import { HostgroupsComponent } from './sudoers-app/hostgroups/hostgroups.component';
 import { AddEditHostgroupComponent } from './sudoers-app/hostgroups/add-edit-hostgroup/add-edit-hostgroup.component';
 import { ShowRemHostgroupComponent } from './sudoers-app/hostgroups/show-rem-hostgroup/show-rem-hostgroup.component';
+import { LoginAppComponent } from './login-app/login-app.component';
+import { authInterceptor } from './auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -76,7 +78,8 @@ import { ShowRemHostgroupComponent } from './sudoers-app/hostgroups/show-rem-hos
     AddEditSudoroleComponent,
     HostgroupsComponent,
     AddEditHostgroupComponent,
-    ShowRemHostgroupComponent
+    ShowRemHostgroupComponent,
+    LoginAppComponent
   ],
   imports: [
     BrowserModule,
@@ -85,7 +88,10 @@ import { ShowRemHostgroupComponent } from './sudoers-app/hostgroups/show-rem-hos
     FormsModule,
     ReactiveFormsModule
   ],
-  providers: [LnxuserService],
+  providers: [
+    LnxuserService,
+    provideHttpClient(withInterceptors([authInterceptor]))
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

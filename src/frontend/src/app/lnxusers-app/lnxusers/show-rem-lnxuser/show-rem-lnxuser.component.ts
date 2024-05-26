@@ -15,6 +15,10 @@ export class ShowRemLnxuserComponent implements OnInit{
 
   constructor(private service: LnxuserService) {}
 
+  modalTitle: string = '';
+  activateAddEditComponent: boolean = false;
+  lnxuser_dep = {};
+
   ngOnInit(): void {
     this.refreshLnxUsersList(this.apiurl);
   }
@@ -41,6 +45,29 @@ export class ShowRemLnxuserComponent implements OnInit{
 
   fetchPrevious() {
     this.refreshLnxUsersList(this.previous);
+  }
+
+  deleteClick(lnxuser: any) {
+    if (confirm('are you sure?')) {
+      this.service.deleteEntry(this.apiurl + lnxuser.pk + '/').subscribe(data => {
+        this.refreshLnxUsersList(this.apiurl);
+      });
+    }
+  }
+
+  editClick(lnxuser: any){
+    this.lnxuser_dep = {
+      'lnxuser': lnxuser,
+      'edit': true
+    };
+    this.modalTitle = 'Edit User';
+    this.activateAddEditComponent = true;
+  }
+
+  closeClick(){
+    this.activateAddEditComponent = false;
+    this.refreshLnxUsersList(this.apiurl);
+    this.lnxuser_dep = {};
   }
 
 }

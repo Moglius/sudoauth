@@ -77,17 +77,13 @@ export class ShowRemLdapgroupComponent implements OnInit{
     this.refreshLdapGroupsList(this.apiurl);
   }
 
-  FilterFn(){
-    var ldapgroupsFilter = this.ldapgroupsFilter;
+  FilterFn(event: any){
 
-    this.ldapgroupList = this.ldapgroupsListWithoutFilter.filter(function (ldapgroup: any){
-        return ldapgroup.sAMAccountName.toString().toLowerCase().includes(
-          ldapgroupsFilter.toString().trim().toLowerCase()
-        )||
-        ldapgroup.objectGUIDHex.toString().toLowerCase().includes(
-          ldapgroupsFilter.toString().trim().toLowerCase()
-        )
-    });
+    if (!event.target || event.target.value.length > 2) {
+      this.refreshLdapGroupsList(`${this.apiurl}?name=${event.target.value}`);
+    } else {
+      this.refreshLdapGroupsList(this.apiurl);
+    }
   }
 
 }

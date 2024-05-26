@@ -1,0 +1,115 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <a routerLink="lnxusers">
+        <div class="card text-center
+                    bg-info text-dark
+                    rounded p-3">
+            <div class="card-body">
+                <h1 class="card-text counter"
+                    data-target="95">
+                    {{ users }}
+                </h1>
+                <p class="card-title
+                          fs-5 text-white">
+                    Linux Users
+                </p>
+            </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a routerLink="lnxgroups">
+        <div class="card text-center
+                    bg-info text-dark
+                    rounded p-3">
+            <div class="card-body">
+                <h1 class="card-text counter"
+                    data-target="95">
+                    {{ groups }}
+                </h1>
+                <p class="card-title
+                          fs-5 text-white">
+                    Linux Groups
+                </p>
+            </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a routerLink="lnxshells">
+        <div class="card text-center
+                    bg-info text-dark
+                    rounded p-3">
+            <div class="card-body">
+                <h1 class="card-text counter"
+                    data-target="95">
+                    {{ shells }}
+                </h1>
+                <p class="card-title
+                          fs-5 text-white">
+                    Linux Shells
+                </p>
+            </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+      <a routerLink="sudorules">
+        <div class="card text-center
+                    bg-info text-dark
+                    rounded p-3">
+            <div class="card-body">
+                <h1 class="card-text counter"
+                    data-target="95">
+                    {{ sudo_rules }}
+                </h1>
+                <p class="card-title
+                          fs-5 text-white">
+                    Sudo Rules
+                </p>
+            </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a routerLink="sudoroles">
+        <div class="card text-center
+                    bg-info text-dark
+                    rounded p-3">
+            <div class="card-body">
+                <h1 class="card-text counter"
+                    data-target="95">
+                    {{ command_roles }}
+                </h1>
+                <p class="card-title
+                          fs-5 text-white">
+                    Command Roles
+                </p>
+            </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a routerLink="hosts">
+        <div class="card text-center
+                    bg-info text-dark
+                    rounded p-3">
+            <div class="card-body">
+                <h1 class="card-text counter"
+                    data-target="95">
+                    {{ hosts }}
+                </h1>
+                <p class="card-title
+                          fs-5 text-white">
+                    Hosts
+                </p>
+            </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
